@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sable — Your presence, amplified</title>
+<meta name="description" content="What you learn becomes what you say. Social, CRM, and audio intelligence in one platform built for people who think seriously about their presence.">
+<meta property="og:title" content="Sable — Your presence, amplified">
+<meta property="og:description" content="What you learn becomes what you say. Social, CRM, and audio intelligence in one platform.">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:    #0B0A13;
+  --s1:    #13121F;
+  --s2:    #1A1928;
+  --s3:    #222032;
+  --s4:    #2C2A3E;
+  --b0:    rgba(255,255,255,0.04);
+  --b1:    rgba(255,255,255,0.08);
+  --b2:    rgba(255,255,255,0.13);
+  --b3:    rgba(255,255,255,0.22);
+  --t1:    #EDEAFF;
+  --t2:    #9895B4;
+  --t3:    #524F6A;
+  --t4:    #2E2C42;
+  --v:     #7C6AF7;
+  --vh:    #6A58E5;
+  --vd:    rgba(124,106,247,0.10);
+  --vm:    rgba(124,106,247,0.18);
+  --teal:  #2DD4BF;
+  --coral: #F4845F;
+  --ok:    #4ADE80;
+  --serif: 'DM Serif Display', Georgia, serif;
+  --sans:  'DM Sans', system-ui, sans-serif;
+}
+
+*,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { background: var(--bg); color: var(--t1); font-family: var(--sans); font-size: 15px; line-height: 1.6; -webkit-font-smoothing: antialiased; scroll-behavior: smooth; }
+body { overflow-x: hidden; }
+a { color: inherit; text-decoration: none; }
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--s4); border-radius: 3px; }
+::selection { background: var(--vm); }
+
+/* NAV */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 40px; height: 58px;
+  background: rgba(11,10,19,0.88);
+  backdrop-filter: blur(18px);
+  border-bottom: 1px solid var(--b1);
+}
+.nav-brand { display: flex; align-items: center; gap: 10px; }
+.nav-mark { width: 30px; height: 30px; background: var(--s1); border: 1px solid var(--b2); border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+.nav-word { font-family: var(--serif); font-size: 16px; color: var(--t1); letter-spacing: -0.025em; }
+.nav-links { display: flex; gap: 28px; }
+.nav-links a { font-size: 13.5px; color: var(--t3); transition: color 120ms; }
+.nav-links a:hover { color: var(--t1); }
+.nav-cta { display: flex; gap: 10px; align-items: center; }
+
+.btn { display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 18px; border-radius: 8px; font-size: 13.5px; font-weight: 400; font-family: var(--sans); cursor: pointer; border: none; transition: all 120ms; letter-spacing: -0.01em; white-space: nowrap; }
+.btn-ghost  { background: transparent; color: var(--t2); border: 1px solid var(--b2); }
+.btn-ghost:hover  { background: var(--s2); color: var(--t1); }
+.btn-violet { background: var(--v); color: #fff; }
+.btn-violet:hover { background: var(--vh); }
+.btn-vl { background: var(--v); color: #fff; height: 46px; padding: 0 28px; font-size: 15px; border-radius: 10px; }
+.btn-vl:hover { background: var(--vh); }
+
+/* HERO */
+.hero {
+  min-height: 100vh; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center; padding: 120px 40px 80px;
+  position: relative; overflow: hidden;
+}
+.hero::before {
+  content: ''; position: absolute; inset: 0;
+  background-image: linear-gradient(rgba(124,106,247,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(124,106,247,0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+  mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%);
+}
+.hero::after {
+  content: ''; position: absolute;
+  width: 700px; height: 700px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(124,106,247,0.07) 0%, transparent 70%);
+  top: 50%; left: 50%; transform: translate(-50%, -60%);
+  pointer-events: none;
+}
+.hero-inner { position: relative; z-index: 1; max-width: 820px; }
+
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-size: 12px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--v); background: var(--vd); border: 1px solid var(--vm);
+  padding: 5px 14px; border-radius: 20px; margin-bottom: 32px;
+}
+.badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--v); animation: pulse 2s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.8)} }
+
+.hero-h1 { font-family: var(--serif); font-size: clamp(3.2rem, 7vw, 5.5rem); font-weight: 400; letter-spacing: -0.045em; line-height: 1.05; color: var(--t1); margin-bottom: 24px; }
+.hero-h1 em { font-style: italic; color: var(--v); }
+.hero-sub { font-size: clamp(1rem, 2vw, 1.15rem); color: var(--t2); line-height: 1.75; max-width: 520px; margin: 0 auto 40px; font-weight: 300; }
+
+.wl-form { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px; }
+.wl-input { height: 46px; padding: 0 18px; min-width: 280px; background: var(--s2); border: 1px solid var(--b2); border-radius: 10px; color: var(--t1); font-size: 14px; font-family: var(--sans); outline: none; transition: border 120ms, box-shadow 120ms; }
+.wl-input::placeholder { color: var(--t3); }
+.wl-input:focus { border-color: var(--v); box-shadow: 0 0 0 3px var(--vd); }
+
+.trust { display: flex; align-items: center; justify-content: center; gap: 20px; flex-wrap: wrap; }
+.trust-item { display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--t3); }
+.trust-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--t4); }
+
+.success-box { display: none; flex-direction: column; align-items: center; gap: 10px; }
+.success-box.show { display: flex; }
+.success-icon { width: 48px; height: 48px; border-radius: 50%; background: rgba(74,222,128,0.12); display: flex; align-items: center; justify-content: center; }
+
+/* PREVIEW */
+.hero-preview { max-width: 700px; margin: 64px auto 0; position: relative; z-index: 1; }
+.preview-win { background: var(--s1); border: 1px solid var(--b2); border-radius: 14px; overflow: hidden; box-shadow: 0 40px 100px rgba(0,0,0,0.6), 0 0 0 1px rgba(124,106,247,0.08); }
+.preview-bar { height: 36px; background: var(--s2); border-bottom: 1px solid var(--b1); display: flex; align-items: center; padding: 0 16px; gap: 6px; }
+.pw-dot { width: 9px; height: 9px; border-radius: 50%; }
+.preview-url { flex: 1; text-align: center; font-size: 11px; color: var(--t3); background: var(--s3); border-radius: 5px; padding: 3px 12px; margin: 0 20px; font-family: monospace; }
+.preview-body { display: grid; grid-template-columns: 170px 1fr; }
+.preview-sb { background: var(--s2); border-right: 1px solid var(--b1); padding: 16px 10px; }
+.pnav-label { font-size: 9px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--t3); padding: 0 8px; margin-bottom: 4px; display: block; }
+.pnav-item { display: flex; align-items: center; justify-content: space-between; padding: 6px 8px; border-radius: 6px; font-size: 11.5px; color: var(--t2); margin-bottom: 1px; }
+.pnav-item.on { background: var(--s3); color: var(--t1); position: relative; }
+.pnav-item.on::before { content: ''; position: absolute; left: 0; top: 5px; bottom: 5px; width: 2px; background: var(--v); border-radius: 0 2px 2px 0; }
+.pnav-badge { font-size: 9px; font-weight: 600; padding: 1px 5px; border-radius: 3px; }
+.nb-v { background: var(--vd); color: var(--v); }
+.nb-c { background: rgba(244,132,95,.12); color: var(--coral); }
+.nb-t { background: rgba(45,212,191,.10); color: var(--teal); }
+.preview-main { padding: 16px; }
+.p-greeting { font-family: var(--serif); font-size: 18px; color: var(--t1); letter-spacing: -.03em; margin-bottom: 2px; }
+.p-date { font-size: 10px; color: var(--t3); margin-bottom: 14px; }
+.p-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 12px; }
+.p-stat { background: var(--s2); border: 1px solid var(--b1); border-radius: 8px; padding: 10px; }
+.p-stat-v { font-family: var(--serif); font-size: 22px; color: var(--t1); letter-spacing: -.04em; line-height: 1; }
+.p-stat-l { font-size: 9px; color: var(--t3); margin-top: 3px; }
+.p-stat-d { font-size: 9px; color: var(--ok); margin-top: 2px; }
+.p-panel { background: var(--s2); border: 1px solid var(--b1); border-radius: 8px; overflow: hidden; }
+.p-panel-h { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; border-bottom: 1px solid var(--b0); font-size: 10.5px; font-weight: 500; color: var(--t2); }
+.p-post-row { display: flex; align-items: center; gap: 8px; padding: 7px 12px; border-bottom: 1px solid var(--b0); }
+.p-post-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+.p-post-text { flex: 1; font-size: 10.5px; color: var(--t2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.p-post-tag { font-size: 9px; font-weight: 600; padding: 1px 5px; border-radius: 3px; flex-shrink: 0; }
+.pt-s { background: var(--vd); color: var(--v); }
+.pt-d { background: var(--s4); color: var(--t3); }
+.p-ai-row { display: flex; align-items: flex-start; gap: 8px; padding: 8px 12px; background: var(--s3); font-size: 10.5px; color: var(--t2); line-height: 1.5; }
+.ai-gem { width: 18px; height: 18px; border-radius: 5px; background: var(--vd); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+/* SECTIONS */
+.sec { padding: 100px 40px; }
+.sec-inner { max-width: 1040px; margin: 0 auto; }
+.sec-label { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--v); margin-bottom: 14px; display: block; }
+.sec-h2 { font-family: var(--serif); font-size: clamp(2rem,4vw,3.2rem); font-weight: 400; letter-spacing: -.035em; line-height: 1.1; color: var(--t1); margin-bottom: 16px; }
+.sec-sub { font-size: 1rem; color: var(--t2); line-height: 1.75; max-width: 480px; font-weight: 300; }
+
+/* PROBLEM */
+.prob-sec { background: var(--s1); border-top: 1px solid var(--b1); border-bottom: 1px solid var(--b1); }
+.prob-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+.prob-a { padding: 60px 60px 60px 0; border-right: 1px solid var(--b1); }
+.prob-b { padding: 60px 0 60px 60px; }
+.prob-list { display: flex; flex-direction: column; gap: 24px; margin-top: 8px; }
+.prob-item { display: flex; gap: 16px; align-items: flex-start; }
+.prob-num { font-family: var(--serif); font-size: 2.8rem; color: var(--b2); line-height: 1; flex-shrink: 0; width: 44px; text-align: right; margin-top: -4px; }
+.prob-text h4 { font-size: 14px; font-weight: 500; color: var(--t1); margin-bottom: 4px; }
+.prob-text p  { font-size: 13px; color: var(--t3); line-height: 1.65; }
+
+/* PILLARS */
+.pillar-row { display: grid; align-items: start; border-top: 1px solid var(--b1); padding: 64px 0; gap: 64px; }
+.pillar-row:first-child { border-top: none; padding-top: 0; }
+.pl-la { grid-template-columns: 2fr 3fr; }
+.pl-lb { grid-template-columns: 3fr 2fr; }
+.p-num { font-family: var(--serif); font-size: 5rem; color: var(--b1); line-height: 1; letter-spacing: -.04em; margin-bottom: -12px; }
+.p-label { font-size: 11px; font-weight: 600; letter-spacing: .09em; text-transform: uppercase; margin-bottom: 14px; padding-left: 16px; border-left: 2px solid; }
+.lv { color: var(--v); border-color: var(--v); }
+.lt { color: var(--teal); border-color: var(--teal); }
+.lc { color: var(--coral); border-color: var(--coral); }
+.p-title { font-family: var(--serif); font-size: clamp(1.8rem,3vw,2.4rem); color: var(--t1); line-height: 1.1; letter-spacing: -.035em; margin-bottom: 16px; }
+.p-desc  { font-size: .95rem; color: var(--t2); line-height: 1.8; margin-bottom: 24px; font-weight: 300; }
+.p-feats { display: flex; flex-direction: column; }
+.p-feat  { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid var(--b0); font-size: 13.5px; color: var(--t2); }
+.p-feat::before { content: ''; width: 18px; height: 1px; background: var(--t4); flex-shrink: 0; }
+.p-feat strong { font-weight: 500; color: var(--t1); }
+
+.p-panel { background: var(--s1); border: 1px solid var(--b2); border-radius: 14px; overflow: hidden; }
+.pp-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid var(--b1); font-size: 12.5px; font-weight: 500; color: var(--t1); }
+.pp-sub { font-size: 11.5px; color: var(--t3); }
+.pp-body { padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+
+.trend-card { background: var(--s2); border: 1px solid var(--b1); border-radius: 10px; padding: 14px; }
+.trend-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 8px; }
+.trend-topic { font-size: 13px; font-weight: 500; color: var(--t1); line-height: 1.4; max-width: 220px; }
+.trend-vel { font-size: 11px; color: var(--ok); font-weight: 600; display: flex; align-items: center; gap: 3px; }
+.trend-quote { font-size: 12px; color: var(--t2); line-height: 1.55; font-style: italic; border-left: 2px solid var(--v); padding-left: 10px; margin-bottom: 10px; }
+.tbtn-p { font-size: 11px; font-weight: 500; padding: 4px 10px; border-radius: 5px; background: var(--v); color: #fff; cursor: pointer; border: none; font-family: var(--sans); margin-right: 6px; }
+.tbtn-g { font-size: 11px; padding: 4px 10px; border-radius: 5px; background: var(--s3); color: var(--t2); cursor: pointer; border: 1px solid var(--b1); font-family: var(--sans); }
+
+.crm-row { display: flex; align-items: center; gap: 10px; background: var(--s2); border: 1px solid var(--b1); border-radius: 10px; padding: 11px 14px; }
+.crm-av { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; flex-shrink: 0; }
+.crm-name { font-size: 13px; font-weight: 500; color: var(--t1); }
+.crm-note { font-size: 11px; color: var(--t3); margin-top: 1px; }
+.crm-badge { margin-left: auto; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 4px; flex-shrink: 0; }
+
+.audio-ep { background: var(--s2); border: 1px solid var(--b1); border-radius: 10px; padding: 14px; }
+.audio-pod { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 5px; }
+.audio-title { font-size: 13px; font-weight: 500; color: var(--t1); line-height: 1.4; margin-bottom: 5px; }
+.audio-meta  { font-size: 11.5px; color: var(--t3); margin-bottom: 10px; }
+.audio-insight { font-size: 12px; color: var(--t2); background: var(--s3); border-left: 2px solid var(--coral); padding: 8px 11px; border-radius: 0 6px 6px 0; line-height: 1.55; margin-bottom: 10px; font-style: italic; }
+
+/* FLYWHEEL */
+.fw-sec { background: var(--s1); border-top: 1px solid var(--b1); border-bottom: 1px solid var(--b1); }
+.fw-grid { display: grid; grid-template-columns: repeat(3,1fr); border: 1px solid var(--b1); border-radius: 14px; overflow: hidden; margin-top: 48px; }
+.fw-cell { padding: 28px 24px; border-right: 1px solid var(--b1); border-bottom: 1px solid var(--b1); }
+.fw-cell:nth-child(3n) { border-right: none; }
+.fw-cell:nth-child(n+4) { border-bottom: none; }
+.fw-from  { font-size: 10.5px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--v); margin-bottom: 10px; }
+.fw-title { font-size: 14px; font-weight: 500; color: var(--t1); margin-bottom: 7px; line-height: 1.35; }
+.fw-desc  { font-size: 12.5px; color: var(--t3); line-height: 1.65; }
+
+/* QUOTES */
+.q-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1px; background: var(--b1); border: 1px solid var(--b1); border-radius: 14px; overflow: hidden; margin-top: 48px; }
+.q-cell { background: var(--s1); padding: 28px 26px; }
+.q-text { font-family: var(--serif); font-size: 1.05rem; color: var(--t1); line-height: 1.65; letter-spacing: -.01em; margin-bottom: 22px; }
+.q-text em { font-style: italic; color: var(--v); }
+.q-author { display: flex; align-items: center; gap: 11px; }
+.q-av { width: 36px; height: 36px; border-radius: 50%; background: var(--s3); border: 1px solid var(--b2); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: var(--t2); flex-shrink: 0; }
+.q-name { font-size: 13px; font-weight: 500; color: var(--t1); }
+.q-role { font-size: 12px; color: var(--t3); margin-top: 1px; }
+
+/* PRICING */
+.pr-sec { background: var(--s1); border-top: 1px solid var(--b1); }
+.pr-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-top: 48px; }
+.plan { background: var(--s2); border: 1px solid var(--b1); border-radius: 14px; padding: 28px; transition: border-color 200ms; }
+.plan:hover { border-color: var(--b3); }
+.plan.feat { border-color: var(--v); background: linear-gradient(135deg, var(--s2), rgba(124,106,247,0.05)); }
+.plan-pop { font-size: 10px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--v); background: var(--vd); border: 1px solid var(--vm); padding: 3px 10px; border-radius: 20px; display: inline-block; margin-bottom: 14px; }
+.plan-name  { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--t3); margin-bottom: 8px; }
+.plan-price { font-family: var(--serif); font-size: 2.6rem; color: var(--t1); letter-spacing: -.04em; line-height: 1; }
+.plan-price span { font-family: var(--sans); font-size: 14px; color: var(--t3); font-weight: 400; }
+.plan-desc { font-size: 12.5px; color: var(--t3); margin: 8px 0 20px; line-height: 1.55; }
+.plan-div  { height: 1px; background: var(--b1); margin-bottom: 18px; }
+.plan-feat { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--t2); padding: 5px 0; }
+.plan-feat::before { content: '✓'; color: var(--v); font-weight: 600; font-size: 12px; }
+.plan-btn { width: 100%; margin-top: 22px; height: 40px; border-radius: 8px; font-size: 13.5px; font-weight: 500; font-family: var(--sans); cursor: pointer; border: none; transition: all 120ms; }
+.plan-btn-p { background: var(--v); color: #fff; }
+.plan-btn-p:hover { background: var(--vh); }
+.plan-btn-s { background: transparent; color: var(--t2); border: 1px solid var(--b2); }
+.plan-btn-s:hover { background: var(--s3); color: var(--t1); }
+
+/* CTA */
+.cta-sec { background: var(--bg); padding: 120px 40px; text-align: center; border-top: 1px solid var(--b1); }
+.cta-h2  { font-family: var(--serif); font-size: clamp(2.4rem,5vw,4rem); font-weight: 400; letter-spacing: -.04em; line-height: 1.1; color: var(--t1); margin-bottom: 16px; }
+.cta-sub { font-size: 1rem; color: var(--t2); line-height: 1.75; max-width: 420px; margin: 0 auto 40px; font-weight: 300; }
+.cta-form { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 14px; }
+.cta-inp  { height: 46px; padding: 0 18px; width: 300px; background: var(--s2); border: 1px solid var(--b2); border-radius: 10px; color: var(--t1); font-size: 14px; font-family: var(--sans); outline: none; transition: border 120ms, box-shadow 120ms; }
+.cta-inp::placeholder { color: var(--t3); }
+.cta-inp:focus { border-color: var(--v); box-shadow: 0 0 0 3px var(--vd); }
+.cta-note { font-size: 12px; color: var(--t3); }
+
+/* FOOTER */
+footer { background: #080711; border-top: 1px solid var(--b0); padding: 48px 40px 36px; }
+.ft-inner { max-width: 1040px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; }
+.ft-brand p { font-size: 12.5px; color: var(--t3); line-height: 1.7; max-width: 240px; margin-top: 12px; }
+.ft-col-title { font-size: 10.5px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--t3); margin-bottom: 14px; }
+.ft-links { display: flex; flex-direction: column; gap: 10px; }
+.ft-links a { font-size: 13px; color: var(--t3); transition: color 120ms; }
+.ft-links a:hover { color: var(--t1); }
+.ft-bottom { max-width: 1040px; margin: 32px auto 0; padding-top: 24px; border-top: 1px solid var(--b0); display: flex; align-items: center; justify-content: space-between; }
+.ft-bottom span { font-size: 12px; color: var(--t4); }
+
+/* REVEAL */
+.reveal { opacity: 0; transform: translateY(20px); transition: opacity 600ms ease, transform 600ms ease; }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+  nav { padding: 0 20px; }
+  .nav-links { display: none; }
+  .hero { padding: 100px 24px 60px; }
+  .hero-preview { display: none; }
+  .sec { padding: 64px 24px; }
+  .prob-grid { grid-template-columns: 1fr; }
+  .prob-a { padding: 0 0 40px; border-right: none; border-bottom: 1px solid var(--b1); margin-bottom: 40px; }
+  .prob-b { padding: 0; }
+  .pillar-row { grid-template-columns: 1fr !important; gap: 32px; }
+  .fw-grid { grid-template-columns: 1fr 1fr; }
+  .fw-cell:nth-child(2n) { border-right: none; }
+  .fw-cell:nth-child(3) { border-right: 1px solid var(--b1); border-bottom: 1px solid var(--b1) !important; }
+  .fw-cell:nth-child(4) { border-bottom: 1px solid var(--b1) !important; }
+  .q-grid, .pr-grid { grid-template-columns: 1fr; }
+  .ft-inner { grid-template-columns: 1fr 1fr; }
+  .cta-inp { width: 260px; }
+}
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <div class="nav-brand">
+    <div class="nav-mark">
+      <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
+        <path d="M4 12 L8 3 L12 12" stroke="#EDEAFF" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <line x1="5.4" y1="9" x2="10.6" y2="9" stroke="#7C6AF7" stroke-width="1.4" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <span class="nav-word">sable</span>
+  </div>
+  <div class="nav-links">
+    <a href="#product">Product</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#about">About</a>
+  </div>
+  <div class="nav-cta">
+    <button class="btn btn-ghost" onclick="scrollToWL()">Sign in</button>
+    <button class="btn btn-violet" onclick="scrollToWL()">Join waitlist</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="top">
+  <div class="hero-inner">
+    <div class="hero-badge"><span class="badge-dot"></span>Now in private beta</div>
+    <h1 class="hero-h1">What you learn<br>becomes what<br>you <em>say.</em></h1>
+    <p class="hero-sub">Sable connects your audio intelligence, your social presence, and your client relationships — so everything you hear becomes something you can use.</p>
+
+    <div class="wl-form" id="hero-form">
+      <input type="email" class="wl-input" placeholder="you@company.com" id="hero-email" onkeydown="if(event.key==='Enter')submit('hero')">
+      <button class="btn btn-vl" onclick="submit('hero')">Join the waitlist</button>
+    </div>
+    <div class="success-box" id="hero-success">
+      <div class="success-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4ADE80" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg></div>
+      <p style="font-size:15px;font-weight:500;color:var(--t1);">You're on the list</p>
+      <p style="font-size:13px;color:var(--t3);">We'll reach out when your spot is ready.</p>
+    </div>
+
+    <div class="trust">
+      <div class="trust-item"><div class="trust-dot"></div>No credit card</div>
+      <div class="trust-item"><div class="trust-dot"></div>Free plan always available</div>
+      <div class="trust-item"><div class="trust-dot"></div>Cancel anytime</div>
+    </div>
+  </div>
+
+  <div class="hero-preview reveal">
+    <div class="preview-win">
+      <div class="preview-bar">
+        <div class="pw-dot" style="background:#FF5F57"></div>
+        <div class="pw-dot" style="background:#FEBC2E"></div>
+        <div class="pw-dot" style="background:#28C840"></div>
+        <div class="preview-url">app.sable.io/dashboard</div>
+      </div>
+      <div class="preview-body">
+        <div class="preview-sb">
+          <div style="display:flex;align-items:center;gap:8px;padding:0 8px;margin-bottom:20px;">
+            <div style="width:22px;height:22px;background:var(--bg);border:1px solid var(--b2);border-radius:6px;display:flex;align-items:center;justify-content:center;">
+              <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M4 12 L8 3 L12 12" stroke="#EDEAFF" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/><line x1="5.4" y1="9" x2="10.6" y2="9" stroke="#7C6AF7" stroke-width="1.4" stroke-linecap="round"/></svg>
+            </div>
+            <span style="font-family:var(--serif);font-size:13px;color:var(--t1);">sable</span>
+          </div>
+          <div style="margin-bottom:16px;">
+            <span class="pnav-label">Overview</span>
+            <div class="pnav-item on">Dashboard</div>
+            <div class="pnav-item" style="color:var(--t3)">Calendar</div>
+          </div>
+          <div>
+            <span class="pnav-label">Pillars</span>
+            <div class="pnav-item" style="color:var(--t3)">Social <span class="pnav-badge nb-v">3</span></div>
+            <div class="pnav-item" style="color:var(--t3)">CRM <span class="pnav-badge nb-c">!</span></div>
+            <div class="pnav-item" style="color:var(--t3)">Audio <span class="pnav-badge nb-t">7</span></div>
+          </div>
+        </div>
+        <div class="preview-main">
+          <div class="p-greeting">Good morning</div>
+          <div class="p-date">Tuesday, 24 October</div>
+          <div class="p-stats">
+            <div class="p-stat"><div class="p-stat-v">12</div><div class="p-stat-l">Posts this week</div><div class="p-stat-d">↑ +4</div></div>
+            <div class="p-stat"><div class="p-stat-v">84k</div><div class="p-stat-l">Impressions</div><div class="p-stat-d">↑ +18%</div></div>
+            <div class="p-stat"><div class="p-stat-v">4</div><div class="p-stat-l">Needs attention</div><div class="p-stat-d" style="color:var(--coral)">Urgent</div></div>
+          </div>
+          <div class="p-panel">
+            <div class="p-panel-h"><span>Upcoming posts</span><span style="font-size:10.5px;color:var(--t3)">View calendar</span></div>
+            <div class="p-post-row"><div class="p-post-dot" style="background:var(--v)"></div><span class="p-post-text">Three things about shipping your first 1,000 users...</span><span class="p-post-tag pt-s">Scheduled</span></div>
+            <div class="p-post-row"><div class="p-post-dot" style="background:var(--t4)"></div><span class="p-post-text">The shift from audience to community building...</span><span class="p-post-tag pt-d">Draft</span></div>
+            <div class="p-ai-row">
+              <div class="ai-gem"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="var(--v)" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+              <span><strong style="color:var(--v);font-weight:500">Trend alert:</strong> Community-building is up 142% in your niche this week.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section class="prob-sec sec" id="product">
+  <div class="sec-inner">
+    <div class="prob-grid">
+      <div class="prob-a reveal">
+        <span class="sec-label" style="color:var(--t3)">The problem</span>
+        <h2 class="sec-h2">You're drowning<br>in disconnected<br>tools.</h2>
+        <p style="font-size:.95rem;color:var(--t2);line-height:1.8;margin-top:20px;font-weight:300">A scheduler here. A CRM there. Podcasts in one app, follow-ups in another. None of them talk to each other — so the insight from your 7am podcast never makes it into your LinkedIn post, and the person who commented on your post never makes it into your pipeline.</p>
+      </div>
+      <div class="prob-b">
+        <div class="prob-list">
+          <div class="prob-item reveal"><div class="prob-num">01</div><div class="prob-text"><h4>Posting without signal</h4><p>Generic content anyone could have written. No niche intelligence driving what you say or when.</p></div></div>
+          <div class="prob-item reveal"><div class="prob-num">02</div><div class="prob-text"><h4>Contacts going cold</h4><p>You meant to follow up. The relationship score drops every week you wait and you don't even know it.</p></div></div>
+          <div class="prob-item reveal"><div class="prob-num">03</div><div class="prob-text"><h4>Learning but not using it</h4><p>You consume podcasts, articles, conversations. Almost none of it makes it into your content or client conversations.</p></div></div>
+          <div class="prob-item reveal"><div class="prob-num">04</div><div class="prob-text"><h4>Three subscriptions, zero synthesis</h4><p>Buffer, HubSpot free, Pocket Casts. $60/mo and four hours a week to stay fragmented.</p></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PILLARS -->
+<section class="sec">
+  <div class="sec-inner">
+    <div style="margin-bottom:56px;padding-bottom:48px;border-bottom:1px solid var(--b1)" class="reveal">
+      <span class="sec-label">How Sable works</span>
+      <h2 class="sec-h2" style="max-width:520px">Three pillars.<br>One intelligence layer.</h2>
+    </div>
+
+    <div class="pillar-row pl-la">
+      <div class="reveal">
+        <div class="p-num">01</div>
+        <div class="p-label lv">Social curator</div>
+        <h3 class="p-title">Post with purpose,<br>not just frequency.</h3>
+        <p class="p-desc">Your AI writing partner that sounds like you, not a template. It learns from your best posts, surfaces what's trending in your niche, and keeps your calendar full — automatically.</p>
+        <div class="p-feats">
+          <div class="p-feat"><strong>Brand voice engine</strong> — learns from 30+ posts</div>
+          <div class="p-feat"><strong>Trend intelligence</strong> — niche-specific, not generic</div>
+          <div class="p-feat"><strong>Multi-platform</strong> — adapts for each channel</div>
+          <div class="p-feat"><strong>Optimal timing</strong> — your audience, not averages</div>
+        </div>
+      </div>
+      <div class="p-panel reveal">
+        <div class="pp-head"><span>Trending in your niche</span><span class="pp-sub">Updated 2h ago</span></div>
+        <div class="pp-body">
+          <div class="trend-card">
+            <div class="trend-top"><div class="trend-topic">The shift from audience-building to community-building</div><div class="trend-vel"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>+142%</div></div>
+            <div class="trend-quote">"Your first 1,000 followers don't need your content — they need your conviction."</div>
+            <button class="tbtn-p">Write about this</button>
+            <button class="tbtn-g">Save</button>
+          </div>
+          <div class="trend-card" style="opacity:.6">
+            <div class="trend-top"><div class="trend-topic">Pricing psychology for service businesses</div><div class="trend-vel">+89%</div></div>
+            <div class="trend-quote">"Anchor to outcome, not to cost..."</div>
+            <button class="tbtn-p">Write about this</button>
+            <button class="tbtn-g">Save</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pillar-row pl-lb">
+      <div class="p-panel reveal">
+        <div class="pp-head"><span>Needs attention</span><span class="pp-sub">4 contacts</span></div>
+        <div class="pp-body">
+          <div class="crm-row">
+            <div class="crm-av" style="background:rgba(124,106,247,.15);color:var(--v)">SC</div>
+            <div><div class="crm-name">Sarah Chen</div><div class="crm-note">Proposal sent 18 days ago</div></div>
+            <div class="crm-badge" style="background:rgba(248,113,113,.12);color:#F87171">Urgent</div>
+          </div>
+          <div class="crm-row">
+            <div class="crm-av" style="background:rgba(45,212,191,.12);color:var(--teal)">JK</div>
+            <div><div class="crm-name">James Kim</div><div class="crm-note">Commented on your post today</div></div>
+            <div class="crm-badge" style="background:rgba(45,212,191,.10);color:var(--teal)">New signal</div>
+          </div>
+          <div style="padding:12px 14px;background:var(--s2);border:1px solid var(--b1);border-radius:10px;border-left:2px solid var(--v)">
+            <p style="font-size:10px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--v);margin-bottom:7px">AI suggestion</p>
+            <p style="font-size:12px;color:var(--t2);line-height:1.6;margin-bottom:10px">"Hey Sarah — I listened to a great podcast about pricing strategy that reminded me of your question..."</p>
+            <button class="tbtn-p">Send this follow-up</button>
+          </div>
+        </div>
+      </div>
+      <div class="reveal">
+        <div class="p-num">02</div>
+        <div class="p-label lt">Smart CRM</div>
+        <h3 class="p-title">Your clients don't<br>care that<br>you're busy.</h3>
+        <p class="p-desc">A relationship manager that notices when you've gone quiet, drafts your follow-ups in your voice, and surfaces the contacts who need attention before you even think to check.</p>
+        <div class="p-feats">
+          <div class="p-feat"><strong>Re-engage queue</strong> — knows who's going cold</div>
+          <div class="p-feat"><strong>AI email drafts</strong> — personalised, in your voice</div>
+          <div class="p-feat"><strong>Social → CRM</strong> — post engagers become contacts</div>
+          <div class="p-feat"><strong>Deal pipeline</strong> — visual, lightweight, fast</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pillar-row pl-la">
+      <div class="reveal">
+        <div class="p-num">03</div>
+        <div class="p-label lc">Audio curator</div>
+        <h3 class="p-title">Stop consuming.<br>Start using<br>what you hear.</h3>
+        <p class="p-desc">A daily brief of what matters in your world. Every podcast transcribed, every insight extracted, every useful moment one click away from becoming your next post or client talking point.</p>
+        <div class="p-feats">
+          <div class="p-feat"><strong>AI episode summaries</strong> — key points, quotes</div>
+          <div class="p-feat"><strong>Daily brief</strong> — curated for you, every morning</div>
+          <div class="p-feat"><strong>Insight → post</strong> — one click, your voice</div>
+          <div class="p-feat"><strong>Tag to contacts</strong> — conversation starters</div>
+        </div>
+      </div>
+      <div class="p-panel reveal">
+        <div class="pp-head"><span>Today's brief</span><span class="pp-sub">4 episodes · 3h 12m</span></div>
+        <div class="pp-body">
+          <div class="audio-ep">
+            <div class="audio-pod" style="color:var(--coral)">Lenny's Podcast</div>
+            <div class="audio-title">Pricing mistakes every early-stage founder makes</div>
+            <div class="audio-meta">58 min · 5 key insights · 3 action items</div>
+            <div class="audio-insight">"Anchor to outcome, not cost — your price should reflect what the client gains, not what you spend."</div>
+            <button class="tbtn-p">Create post from this</button>
+            <button class="tbtn-g">Tag to contact</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FLYWHEEL -->
+<section class="fw-sec sec">
+  <div class="sec-inner">
+    <div class="reveal">
+      <span class="sec-label">The intelligence flywheel</span>
+      <h2 class="sec-h2">Each pillar makes<br>the others smarter.</h2>
+      <p class="sec-sub" style="margin-top:14px">This is what separates Sable from three separate tools. The data flows between pillars — what you hear shapes what you say, what you say brings you closer to the right people.</p>
+    </div>
+    <div class="fw-grid">
+      <div class="fw-cell reveal"><div class="fw-from">Audio → Social</div><div class="fw-title">Insights become posts</div><div class="fw-desc">One click turns a podcast insight into a caption in your exact voice.</div></div>
+      <div class="fw-cell reveal"><div class="fw-from">Social → CRM</div><div class="fw-title">Engagement becomes contacts</div><div class="fw-desc">Post commenters who signal interest are automatically suggested as CRM contacts.</div></div>
+      <div class="fw-cell reveal"><div class="fw-from">CRM → Social</div><div class="fw-title">Relationships shape content</div><div class="fw-desc">Your clients' interests feed into what topics Sable recommends you post about.</div></div>
+      <div class="fw-cell reveal"><div class="fw-from">Social → Audio</div><div class="fw-title">Posts guide listening</div><div class="fw-desc">Top-performing topics surface related episodes in your daily brief.</div></div>
+      <div class="fw-cell reveal"><div class="fw-from">Audio → CRM</div><div class="fw-title">Insights tag contacts</div><div class="fw-desc">Bookmark a podcast moment to a contact's record as a conversation starter.</div></div>
+      <div class="fw-cell reveal"><div class="fw-from">CRM → Schedule</div><div class="fw-title">Timing gets personal</div><div class="fw-desc">Your audience's engagement patterns inform exactly when your posts go live.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- QUOTES -->
+<section class="sec">
+  <div class="sec-inner">
+    <div class="reveal">
+      <span class="sec-label">Early access feedback</span>
+      <h2 class="sec-h2">Built for people who<br>think seriously about<br>their presence.</h2>
+    </div>
+    <div class="q-grid">
+      <div class="q-cell reveal"><div class="q-text">"The moment I saw a podcast insight turn into a LinkedIn post in my voice — I understood what this was. It's not a scheduler. It's a <em>thinking partner.</em>"</div><div class="q-author"><div class="q-av">AK</div><div><div class="q-name">Amara Kone</div><div class="q-role">B2B consultant, Lagos</div></div></div></div>
+      <div class="q-cell reveal"><div class="q-text">"I've tried six CRMs. This is the first one that <em>tells me</em> who to reach out to. I don't have to remember anything — it remembers for me."</div><div class="q-author"><div class="q-av">JL</div><div><div class="q-name">Jake Liu</div><div class="q-role">Freelance designer, San Francisco</div></div></div></div>
+      <div class="q-cell reveal"><div class="q-text">"It generated a post that sounded so much like me, I had to check I didn't write it. <em>It had read my posts.</em>"</div><div class="q-author"><div class="q-av">NB</div><div><div class="q-name">Nina Barlow</div><div class="q-role">Executive coach, London</div></div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pr-sec sec" id="pricing">
+  <div class="sec-inner">
+    <div class="reveal">
+      <span class="sec-label">Pricing</span>
+      <h2 class="sec-h2">Honest. Simple.<br>Earns its keep.</h2>
+      <p class="sec-sub" style="margin-top:14px">Start free. Upgrade when Sable is clearly saving you more time than it costs.</p>
+    </div>
+    <div class="pr-grid">
+      <div class="plan reveal">
+        <div class="plan-name">Free</div>
+        <div class="plan-price">$0<span>/mo</span></div>
+        <p class="plan-desc">For getting a feel for the platform.</p>
+        <div class="plan-div"></div>
+        <div class="plan-feat">3 scheduled posts / week</div>
+        <div class="plan-feat">2 social platforms</div>
+        <div class="plan-feat">10 CRM contacts</div>
+        <div class="plan-feat">10 AI generations / day</div>
+        <div class="plan-feat">5 audio summaries / mo</div>
+        <button class="plan-btn plan-btn-s" onclick="scrollToWL()">Join waitlist</button>
+      </div>
+      <div class="plan feat reveal">
+        <div class="plan-pop">Most popular</div>
+        <div class="plan-name">Growth</div>
+        <div class="plan-price">$39<span>/mo</span></div>
+        <p class="plan-desc">For solopreneurs and creators who are serious.</p>
+        <div class="plan-div"></div>
+        <div class="plan-feat">Unlimited scheduled posts</div>
+        <div class="plan-feat">5 social platforms</div>
+        <div class="plan-feat">500 CRM contacts</div>
+        <div class="plan-feat">Unlimited AI generations</div>
+        <div class="plan-feat">Full audio curator</div>
+        <div class="plan-feat">Analytics dashboard</div>
+        <button class="plan-btn plan-btn-p" onclick="scrollToWL()">Join waitlist</button>
+      </div>
+      <div class="plan reveal">
+        <div class="plan-name">Business</div>
+        <div class="plan-price">$89<span>/mo</span></div>
+        <p class="plan-desc">For small teams and growing businesses.</p>
+        <div class="plan-div"></div>
+        <div class="plan-feat">Everything in Growth</div>
+        <div class="plan-feat">3 team seats</div>
+        <div class="plan-feat">Unlimited contacts</div>
+        <div class="plan-feat">Email sequences</div>
+        <div class="plan-feat">White-label reports</div>
+        <button class="plan-btn plan-btn-s" onclick="scrollToWL()">Talk to us</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-sec" id="waitlist">
+  <div style="max-width:500px;margin:0 auto">
+    <span class="sec-label" style="display:block;text-align:center;color:rgba(124,106,247,.6);margin-bottom:14px">Early access</span>
+    <h2 class="cta-h2">Ready when<br>you are.</h2>
+    <p class="cta-sub">Join the waitlist. We're opening access to a small group each week — people ready to stop juggling and start compounding.</p>
+    <div id="cta-wrap">
+      <div class="cta-form">
+        <input type="email" class="cta-inp" placeholder="you@company.com" id="cta-email" onkeydown="if(event.key==='Enter')submit('cta')">
+        <button class="btn btn-vl" onclick="submit('cta')">Join waitlist</button>
+      </div>
+      <p class="cta-note">No spam. One email when your spot is ready.</p>
+    </div>
+    <div class="success-box" id="cta-success" style="margin-top:20px">
+      <div class="success-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4ADE80" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg></div>
+      <p style="font-size:16px;font-weight:500;color:var(--t1)">You're on the list.</p>
+      <p style="font-size:13px;color:var(--t3)">We'll reach out when your spot is ready. Thank you.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="ft-inner">
+    <div class="ft-brand">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="nav-mark" style="width:26px;height:26px">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M4 12 L8 3 L12 12" stroke="#9895B4" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/><line x1="5.4" y1="9" x2="10.6" y2="9" stroke="#7C6AF7" stroke-width="1.4" stroke-linecap="round"/></svg>
+        </div>
+        <span style="font-family:var(--serif);font-size:15px;color:var(--t2);letter-spacing:-.025em">sable</span>
+      </div>
+      <p>What you learn becomes what you say. A platform for people who think seriously about their presence.</p>
+    </div>
+    <div>
+      <div class="ft-col-title">Product</div>
+      <div class="ft-links">
+        <a href="#product">Social curator</a>
+        <a href="#product">Smart CRM</a>
+        <a href="#product">Audio curator</a>
+        <a href="#pricing">Pricing</a>
+      </div>
+    </div>
+    <div>
+      <div class="ft-col-title">Company</div>
+      <div class="ft-links">
+        <a href="#">About</a>
+        <a href="#">Blog</a>
+        <a href="#">Careers</a>
+        <a href="#">Contact</a>
+      </div>
+    </div>
+    <div>
+      <div class="ft-col-title">Legal</div>
+      <div class="ft-links">
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Security</a>
+      </div>
+    </div>
+  </div>
+  <div class="ft-bottom">
+    <span>© 2025 Sable Technologies, Inc.</span>
+    <span>Designed with intention.</span>
+  </div>
+</footer>
+
+<script>
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add('visible'); obs.unobserve(e.target); } })
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' })
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el))
+
+window.addEventListener('scroll', () => {
+  document.getElementById('nav').style.borderBottomColor = window.scrollY > 20 ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.08)'
+})
+
+function submit(src) {
+  const id = src === 'hero' ? 'hero-email' : 'cta-email'
+  const val = document.getElementById(id).value.trim()
+  if (!val || !val.includes('@')) {
+    const el = document.getElementById(id)
+    el.style.borderColor = '#F87171'
+    el.style.boxShadow = '0 0 0 3px rgba(248,113,113,0.15)'
+    setTimeout(() => { el.style.borderColor = ''; el.style.boxShadow = ''; }, 2000)
+    return
+  }
+  if (src === 'hero') {
+    document.getElementById('hero-form').style.display = 'none'
+    document.getElementById('hero-success').classList.add('show')
+  } else {
+    document.getElementById('cta-wrap').style.display = 'none'
+    document.getElementById('cta-success').classList.add('show')
+  }
+}
+
+function scrollToWL() {
+  document.getElementById('waitlist').scrollIntoView({ behavior: 'smooth' })
+}
+</script>
+</body>
+</html>
