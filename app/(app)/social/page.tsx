@@ -3,9 +3,9 @@
 import { useState } from 'react'
 
 const PLATFORMS = [
-  { id: 'instagram', label: 'Instagram', color: '#E1306C', dimColor: 'rgba(225,48,108,0.12)' },
-  { id: 'linkedin',  label: 'LinkedIn',  color: '#0A66C2', dimColor: 'rgba(10,102,194,0.12)' },
-  { id: 'twitter',   label: 'Twitter/X', color: '#EAE6FF', dimColor: 'rgba(234,230,255,0.08)' },
+  { id: 'instagram', label: 'Instagram', color: '#E1306C', dim: 'rgba(225,48,108,0.12)', border: 'rgba(225,48,108,0.30)' },
+  { id: 'linkedin',  label: 'LinkedIn',  color: '#4B99D8', dim: 'rgba(75,153,216,0.12)',  border: 'rgba(75,153,216,0.30)' },
+  { id: 'twitter',   label: 'Twitter/X', color: 'var(--t2)', dim: 'var(--s3)', border: 'var(--b2)' },
 ]
 
 const CHAR_LIMITS: Record<string, number> = {
@@ -14,121 +14,112 @@ const CHAR_LIMITS: Record<string, number> = {
   twitter:   280,
 }
 
-const OPTIMAL_TIMES = [
-  'Today 9:00 AM',
-  'Today 12:00 PM',
-  'Tomorrow 9:00 AM',
-  'Tomorrow 6:00 PM',
-]
+const TIMES = ['Best time: Today 9 AM', 'Today 12 PM', 'Tomorrow 9 AM', 'Tomorrow 6 PM']
 
 export default function SocialPage() {
-  const [body, setBody]                     = useState('')
-  const [selected, setSelected]             = useState<Set<string>>(new Set(['linkedin']))
-  const [aiPrompt, setAiPrompt]             = useState('')
-  const [generating, setGenerating]         = useState(false)
-  const [scheduledTime, setScheduledTime]   = useState('')
+  const [body, setBody]                       = useState('')
+  const [selected, setSelected]               = useState<Set<string>>(new Set(['linkedin']))
+  const [aiPrompt, setAiPrompt]               = useState('')
+  const [generating, setGenerating]           = useState(false)
+  const [scheduledTime, setScheduledTime]     = useState(TIMES[0])
   const [previewPlatform, setPreviewPlatform] = useState('linkedin')
-  const [saved, setSaved]                   = useState(false)
+  const [status, setStatus]                   = useState<'idle' | 'saved'>('idle')
 
   const togglePlatform = (id: string) => {
     setSelected(prev => {
       const next = new Set(prev)
-      next.has(id) ? next.delete(id) : next.add(id)
-      if (next.size === 0) next.add(id)
+      if (next.has(id) && next.size > 1) next.delete(id)
+      else next.add(id)
+      if (!next.has(previewPlatform)) setPreviewPlatform([...next][0])
       return next
     })
   }
 
-  const mostRestrictiveLimit = Math.min(
-    ...[...selected].map(p => CHAR_LIMITS[p] ?? 3000)
-  )
+  const limit = Math.min(...[...selected].map(p => CHAR_LIMITS[p] ?? 3000))
+  const pct   = Math.min((body.length / limit) * 100, 100)
+  const over  = body.length > limit
 
-  const charPct = Math.min((body.length / mostRestrictiveLimit) * 100, 100)
-  const charOver = body.length > mostRestrictiveLimit
-
-  const generateCaption = async () => {
+  const generate = async () => {
     if (!aiPrompt.trim()) return
     setGenerating(true)
-    await new Promise(r => setTimeout(r, 1500))
-    setBody(`Here's what nobody tells you about ${aiPrompt}:\n\nThe thing that actually matters isn't what you think. After spending years in this space, I've learned that the fundamentals always win — even when everything else is changing.\n\nThree things I keep coming back to:\n\n1. Consistency beats perfection every time\n2. The best insight is the one you actually share\n3. Your audience wants to hear from you, not a polished version of you\n\nWhat's your take? Drop it in the comments.\n\n#growth #${aiPrompt.toLowerCase().replace(/\s+/g, '')} #insights`)
+    await new Promise(r => setTimeout(r, 1600))
+    setBody(`Here's what nobody tells you about ${aiPrompt}:\n\nThe most important lesson I've learned isn't about tactics — it's about consistency and genuine value.\n\nAfter years in this space, three things keep proving themselves true:\n\n1. Show your thinking, not just your conclusions\n2. The audience you want is attracted by specificity, not breadth\n3. Your unique perspective is the only thing that can't be replicated\n\nThe people who win are the ones who keep showing up with real insight, not polished performance.\n\nWhat's your experience been?\n\n#${aiPrompt.toLowerCase().replace(/\s+/g, '')} #growth #insights`)
     setGenerating(false)
   }
 
-  const handleSchedule = async () => {
-    setSaved(true)
-    setTimeout(() => setSaved(false), 3000)
+  const handleSchedule = () => {
+    if (!body.trim()) return
+    setStatus('saved')
+    setTimeout(() => setStatus('idle'), 3000)
+  }
+
+  const s: Record<string, React.CSSProperties> = {
+    wrap:       { display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' },
+    composer:   { flex: 1, display: 'grid', gridTemplateColumns: '1fr 290px', overflow: 'hidden' },
+    writePane:  { display: 'flex', flexDirection: 'column', borderRight: '1px solid var(--b1)', overflow: 'hidden' },
+    platRow:    { display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 20px', borderBottom: '1px solid var(--b0)', flexWrap: 'wrap', background: 'var(--s1)' },
+    aiBar:      { display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 20px', borderBottom: '1px solid var(--b0)', background: 'var(--s2)' },
+    textarea:   { flex: 1, width: '100%', padding: '22px 24px', background: 'var(--bg)', border: 'none', outline: 'none', resize: 'none', fontSize: '14.5px', color: 'var(--t1)', fontFamily: 'var(--sans)', fontWeight: 300, lineHeight: 1.8, letterSpacing: '-0.01em' },
+    toolbar:    { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 20px', borderTop: '1px solid var(--b0)', background: 'var(--s1)', flexShrink: 0 },
+    preview:    { display: 'flex', flexDirection: 'column', background: 'var(--s1)', overflow: 'hidden' },
+    prevHead:   { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', borderBottom: '1px solid var(--b0)' },
+    prevBody:   { flex: 1, overflowY: 'auto', padding: '16px' },
+    mockPost:   { background: 'var(--s2)', border: '1px solid var(--b1)', borderRadius: '10px', padding: '14px' },
+  }
+
+  const TIPS: Record<string, string[]> = {
+    instagram: ['Move hashtags to first comment', 'Aspect ratio: 4:5 to 1.91:1', 'Max 30 hashtags total'],
+    linkedin:  ['No hashtags in first line', '3–5 hashtags at end performs best', 'Question CTAs drive 2× comments'],
+    twitter:   ['Over 280 chars becomes a thread', 'Max 2 hashtags recommended', 'Images get 2× engagement'],
   }
 
   return (
-    <div className="flex flex-col h-full">
-
-      {/* Page header */}
-      <div className="flex items-center justify-between px-[32px] py-[20px] border-b border-[var(--b1)]">
+    <div style={s.wrap}>
+      <div className="page-header">
         <div>
-          <h1 className="font-serif text-[1.6rem] text-t1 tracking-[-0.035em] leading-[1.1]">
-            Social
-          </h1>
-          <p className="text-[12px] text-t3 mt-[2px]">Create and schedule posts</p>
+          <h1 className="page-title">Social</h1>
+          <p className="page-subtitle">Create and schedule posts across your platforms</p>
         </div>
-        <div className="flex items-center gap-[8px]">
-          <button className="
-            h-[32px] px-[14px] text-[12.5px] text-t2
-            bg-transparent border border-[var(--b2)] rounded-[7px]
-            cursor-pointer hover:text-t1 hover:border-[var(--b3)]
-            transition-all duration-[120ms]
-          ">
-            View calendar
-          </button>
-        </div>
+        <button className="btn-secondary">View calendar</button>
       </div>
 
-      {/* Composer */}
-      <div className="flex-1 overflow-hidden grid grid-cols-[1fr_280px]">
+      <div style={s.composer}>
 
-        {/* Left: write pane */}
-        <div className="flex flex-col border-r border-[var(--b1)] overflow-hidden">
+        {/* Write pane */}
+        <div style={s.writePane}>
 
           {/* Platform selector */}
-          <div className="flex items-center gap-[8px] px-[20px] py-[14px] border-b border-[var(--b0)] flex-wrap">
-            <span className="text-[10.5px] font-medium tracking-[0.06em] uppercase text-t3 mr-[4px]">
+          <div style={s.platRow}>
+            <span style={{ fontSize: '11px', fontWeight: 500, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--t3)', marginRight: '4px' }}>
               Post to
             </span>
             {PLATFORMS.map(p => (
               <button
                 key={p.id}
                 onClick={() => togglePlatform(p.id)}
-                className="
-                  flex items-center gap-[4px] px-[10px] h-[26px]
-                  rounded-[6px] text-[11.5px] font-medium
-                  border transition-all duration-[120ms] cursor-pointer
-                "
                 style={{
-                  background:  selected.has(p.id) ? p.dimColor : 'transparent',
-                  color:       selected.has(p.id) ? p.color    : '#4A4760',
-                  borderColor: selected.has(p.id) ? p.color    : 'rgba(255,255,255,0.07)',
+                  display: 'inline-flex', alignItems: 'center',
+                  padding: '0 12px', height: '28px',
+                  borderRadius: '6px', fontSize: '12px', fontWeight: 500,
+                  cursor: 'pointer', border: '1px solid',
+                  transition: 'all 120ms', background: 'transparent',
+                  color:       selected.has(p.id) ? p.color     : 'var(--t3)',
+                  borderColor: selected.has(p.id) ? p.border    : 'var(--b1)',
+                  backgroundColor: selected.has(p.id) ? p.dim   : 'transparent',
                 }}
               >
                 {p.label}
               </button>
             ))}
-            <button className="
-              px-[10px] h-[26px] rounded-[6px]
-              text-[11px] text-t3 border border-[var(--b1)]
-              bg-transparent cursor-pointer
-              hover:text-t2 hover:border-[var(--b2)]
-              transition-all duration-[120ms]
-            ">
+            <button style={{ padding: '0 10px', height: '28px', borderRadius: '6px', fontSize: '11.5px', color: 'var(--t3)', border: '1px solid var(--b1)', background: 'transparent', cursor: 'pointer' }}>
               + Connect more
             </button>
           </div>
 
-          {/* AI prompt strip */}
-          <div className="flex items-center gap-[10px] px-[20px] py-[10px] border-b border-[var(--b0)] bg-s1">
-            <div className="
-              w-[20px] h-[20px] rounded-[5px] bg-[var(--vd)]
-              flex items-center justify-center flex-shrink-0
-            ">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#7C6AF7" strokeWidth="1.5">
+          {/* AI bar */}
+          <div style={s.aiBar}>
+            <div style={{ width: '22px', height: '22px', borderRadius: '6px', background: 'var(--vd)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--v)" strokeWidth="1.5">
                 <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
               </svg>
             </div>
@@ -137,23 +128,13 @@ export default function SocialPage() {
               placeholder="What do you want to post about? Press Enter to generate..."
               value={aiPrompt}
               onChange={e => setAiPrompt(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && generateCaption()}
-              className="
-                flex-1 bg-transparent border-none outline-none
-                text-[12.5px] text-t1 placeholder:text-t3
-                font-sans
-              "
+              onKeyDown={e => e.key === 'Enter' && generate()}
+              style={{ flex: 1, background: 'transparent', border: 'none', outline: 'none', fontSize: '13px', color: 'var(--t1)', fontFamily: 'var(--sans)' }}
             />
             <button
-              onClick={generateCaption}
+              onClick={generate}
               disabled={!aiPrompt.trim() || generating}
-              className="
-                flex-shrink-0 text-[11.5px] font-medium
-                px-[10px] h-[26px] rounded-[5px]
-                bg-[var(--v)] text-white border-none cursor-pointer
-                hover:bg-[var(--vh)] transition-all duration-[120ms]
-                disabled:opacity-40 disabled:cursor-not-allowed
-              "
+              className="btn-primary btn-sm"
             >
               {generating ? 'Writing...' : 'Generate'}
             </button>
@@ -163,170 +144,117 @@ export default function SocialPage() {
           <textarea
             value={body}
             onChange={e => setBody(e.target.value)}
-            placeholder="What do you want to say today?"
-            className="
-              flex-1 bg-bg border-none outline-none resize-none
-              text-[14px] text-t1 font-sans font-light
-              leading-[1.75] tracking-[-0.01em]
-              p-[24px] placeholder:text-t4
-            "
+            placeholder="What do you want to say? Use the AI bar above or write your own..."
+            style={s.textarea}
           />
 
           {/* Toolbar */}
-          <div className="
-            flex items-center justify-between
-            px-[20px] py-[12px] border-t border-[var(--b0)] bg-s1
-          ">
-            <div className="flex items-center gap-[14px]">
-              <button className="
-                flex items-center gap-[6px] text-[12px] text-t3
-                bg-none border-none cursor-pointer
-                hover:text-t1 transition-colors
-              ">
+          <div style={s.toolbar}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <button className="btn-ghost" style={{ height: '30px', fontSize: '12.5px' }}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                   <rect x="3" y="3" width="18" height="18" rx="2"/>
                   <circle cx="8.5" cy="8.5" r="1.5"/>
                   <polyline points="21 15 16 10 5 21"/>
                 </svg>
-                Media
+                Add media
               </button>
-
-              {/* Char counter */}
               {body.length > 0 && (
-                <div className="flex items-center gap-[7px]">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <svg width="28" height="28" viewBox="0 0 28 28">
-                    <circle cx="14" cy="14" r="10" fill="none" stroke="#211F30" strokeWidth="2"/>
-                    <circle
-                      cx="14" cy="14" r="10"
-                      fill="none"
-                      stroke={charOver ? '#F87171' : charPct > 85 ? '#FCD34D' : '#7C6AF7'}
-                      strokeWidth="2"
-                      strokeLinecap="round"
+                    <circle cx="14" cy="14" r="10" fill="none" stroke="var(--s4)" strokeWidth="2.5"/>
+                    <circle cx="14" cy="14" r="10" fill="none"
+                      stroke={over ? 'var(--err)' : pct > 85 ? 'var(--amber)' : 'var(--v)'}
+                      strokeWidth="2.5" strokeLinecap="round"
                       strokeDasharray="62.8"
-                      strokeDashoffset={62.8 * (1 - charPct / 100)}
+                      strokeDashoffset={62.8 * (1 - pct / 100)}
                       style={{ transform: 'rotate(-90deg)', transformOrigin: '50% 50%' }}
                     />
                   </svg>
-                  <span className={`text-[11px] tabular-nums ${charOver ? 'text-[#F87171]' : 'text-t3'}`}>
-                    {charOver ? `-${body.length - mostRestrictiveLimit}` : `${mostRestrictiveLimit - body.length}`}
+                  <span style={{ fontSize: '11.5px', color: over ? 'var(--err)' : 'var(--t3)', fontVariantNumeric: 'tabular-nums' }}>
+                    {over ? `-${body.length - limit}` : `${limit - body.length}`}
                   </span>
                 </div>
               )}
             </div>
 
-            <div className="flex items-center gap-[8px]">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <select
                 value={scheduledTime}
                 onChange={e => setScheduledTime(e.target.value)}
-                className="
-                  appearance-none bg-s2 border border-[var(--b1)]
-                  rounded-[6px] text-[12px] text-t2 font-sans
-                  px-[10px] h-[30px] cursor-pointer outline-none
-                  hover:border-[var(--b2)] transition-colors
-                "
+                style={{
+                  appearance: 'none', height: '32px', padding: '0 28px 0 10px',
+                  background: 'var(--s2)', border: '1px solid var(--b2)',
+                  borderRadius: '7px', color: 'var(--t1)', fontSize: '12.5px',
+                  fontFamily: 'var(--sans)', cursor: 'pointer', outline: 'none',
+                  backgroundImage: `url("data:image/svg+xml,%3Csvg width='10' height='7' viewBox='0 0 10 7' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%235C5878' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E")`,
+                  backgroundRepeat: 'no-repeat', backgroundPosition: 'right 8px center',
+                }}
               >
-                <option value="">Schedule time...</option>
-                {OPTIMAL_TIMES.map(t => (
-                  <option key={t} value={t}>{t}</option>
-                ))}
+                {TIMES.map(t => <option key={t} value={t}>{t}</option>)}
               </select>
-              <button className="
-                h-[30px] px-[12px] text-[12.5px] text-t2
-                bg-transparent border border-[var(--b2)] rounded-[7px]
-                cursor-pointer hover:text-t1 hover:border-[var(--b3)]
-                transition-all duration-[120ms]
-              ">
-                Save draft
-              </button>
+              <button className="btn-secondary btn-sm">Save draft</button>
               <button
-                onClick={handleSchedule}
+                className="btn-primary btn-sm"
                 disabled={!body.trim() || selected.size === 0}
-                className="
-                  h-[30px] px-[14px] text-[12.5px]
-                  bg-[var(--v)] text-white rounded-[7px]
-                  border-none cursor-pointer
-                  hover:bg-[var(--vh)] transition-all duration-[120ms]
-                  disabled:opacity-40 disabled:cursor-not-allowed
-                "
+                onClick={handleSchedule}
+                style={status === 'saved' ? { background: 'var(--ok)', color: '#071a0e' } : {}}
               >
-                {saved ? '✓ Scheduled' : scheduledTime ? 'Schedule' : 'Post now'}
+                {status === 'saved' ? '✓ Scheduled' : 'Schedule'}
               </button>
             </div>
           </div>
         </div>
 
-        {/* Right: preview pane */}
-        <div className="flex flex-col bg-s1 overflow-hidden">
-          <div className="flex items-center justify-between px-[16px] py-[14px] border-b border-[var(--b0)]">
-            <span className="text-[10.5px] font-medium tracking-[0.07em] uppercase text-t3">
+        {/* Preview pane */}
+        <div style={s.preview}>
+          <div style={s.prevHead}>
+            <span style={{ fontSize: '10.5px', fontWeight: 500, letterSpacing: '0.07em', textTransform: 'uppercase', color: 'var(--t3)' }}>
               Preview
             </span>
-            <div className="flex gap-[3px]">
-              {[...selected].map(id => (
-                <button
-                  key={id}
-                  onClick={() => setPreviewPlatform(id)}
-                  className="
-                    text-[11px] px-[8px] h-[22px] rounded-[4px]
-                    border-none cursor-pointer transition-all duration-[120ms]
-                  "
-                  style={{
-                    background: previewPlatform === id ? '#211F30' : 'transparent',
-                    color:      previewPlatform === id ? '#EAE6FF' : '#4A4760',
-                  }}
-                >
-                  {PLATFORMS.find(p => p.id === id)?.label}
-                </button>
-              ))}
+            <div style={{ display: 'flex', gap: '3px' }}>
+              {[...selected].map(id => {
+                const p = PLATFORMS.find(x => x.id === id)!
+                const active = previewPlatform === id
+                return (
+                  <button key={id} onClick={() => setPreviewPlatform(id)} style={{
+                    fontSize: '11px', padding: '3px 9px', borderRadius: '5px',
+                    border: 'none', cursor: 'pointer', transition: 'all 120ms',
+                    background: active ? 'var(--s3)' : 'transparent',
+                    color: active ? 'var(--t1)' : 'var(--t3)',
+                  }}>
+                    {p.label}
+                  </button>
+                )
+              })}
             </div>
           </div>
-
-          <div className="flex-1 overflow-y-auto p-[16px]">
-            {/* Mock post */}
-            <div className="bg-s2 border border-[var(--b1)] rounded-[10px] p-[14px]">
-              <div className="flex items-center gap-[9px] mb-[11px]">
-                <div className="
-                  w-[30px] h-[30px] rounded-full bg-s3
-                  border border-[var(--b2)]
-                  flex items-center justify-center
-                  text-[10px] font-medium text-t2
-                ">
+          <div style={s.prevBody}>
+            <div style={s.mockPost}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '9px', marginBottom: '11px' }}>
+                <div style={{ width: '30px', height: '30px', borderRadius: '50%', background: 'var(--s4)', border: '1px solid var(--b2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', fontWeight: 500, color: 'var(--t2)', flexShrink: 0 }}>
                   YB
                 </div>
                 <div>
-                  <p className="text-[12.5px] font-medium text-t1">Your Brand</p>
-                  <p className="text-[10.5px] text-t3 capitalize">{previewPlatform}</p>
+                  <p style={{ fontSize: '12.5px', fontWeight: 500, color: 'var(--t1)' }}>Your Brand</p>
+                  <p style={{ fontSize: '10.5px', color: 'var(--t3)', textTransform: 'capitalize' }}>{previewPlatform}</p>
                 </div>
               </div>
-              <p className="text-[12.5px] text-t2 leading-[1.65] whitespace-pre-wrap break-words">
-                {body || <span className="text-t4 italic">Your caption will appear here...</span>}
+              <p style={{ fontSize: '12.5px', color: body ? 'var(--t1)' : 'var(--t4)', lineHeight: 1.65, whiteSpace: 'pre-wrap', wordBreak: 'break-word', fontStyle: body ? 'normal' : 'italic', minHeight: '60px' }}>
+                {body || 'Your caption will appear here...'}
               </p>
             </div>
 
-            {/* Platform tips */}
-            <div className="mt-[14px]">
-              <p className="text-[10.5px] font-medium tracking-[0.06em] uppercase text-t3 mb-[8px] capitalize">
-                {previewPlatform} tips
+            <div style={{ marginTop: '14px' }}>
+              <p style={{ fontSize: '10.5px', fontWeight: 500, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--t3)', marginBottom: '8px' }}>
+                {PLATFORMS.find(p => p.id === previewPlatform)?.label} tips
               </p>
-              {previewPlatform === 'instagram' && (
-                <>
-                  <p className="text-[11.5px] text-t3 mb-[3px] flex gap-[6px]"><span className="text-t4">—</span>Move hashtags to first comment</p>
-                  <p className="text-[11.5px] text-t3 mb-[3px] flex gap-[6px]"><span className="text-t4">—</span>Aspect ratio: 4:5 to 1.91:1</p>
-                </>
-              )}
-              {previewPlatform === 'linkedin' && (
-                <>
-                  <p className="text-[11.5px] text-t3 mb-[3px] flex gap-[6px]"><span className="text-t4">—</span>No hashtags in first line</p>
-                  <p className="text-[11.5px] text-t3 mb-[3px] flex gap-[6px]"><span className="text-t4">—</span>3–5 hashtags at the end performs best</p>
-                  <p className="text-[11.5px] text-t3 mb-[3px] flex gap-[6px]"><span className="text-t4">—</span>Question CTAs drive 2× more comments</p>
-                </>
-              )}
-              {previewPlatform === 'twitter' && (
-                <>
-                  <p className="text-[11.5px] text-t3 mb-[3px] flex gap-[6px]"><span className="text-t4">—</span>Over 280 chars becomes a thread</p>
-                  <p className="text-[11.5px] text-t3 mb-[3px] flex gap-[6px]"><span className="text-t4">—</span>Max 2 hashtags recommended</p>
-                </>
-              )}
+              {(TIPS[previewPlatform] ?? []).map((tip, i) => (
+                <div key={i} style={{ display: 'flex', gap: '8px', marginBottom: '5px' }}>
+                  <span style={{ color: 'var(--t4)', fontSize: '11.5px', flexShrink: 0 }}>—</span>
+                  <span style={{ fontSize: '11.5px', color: 'var(--t3)', lineHeight: 1.5 }}>{tip}</span>
+                </div>
+              ))}
             </div>
           </div>
         </div>

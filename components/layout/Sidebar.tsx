@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { UserButton } from '@clerk/nextjs'
 import { SableMark } from '@/components/ui/SableMark'
+import { ThemeToggle } from '@/components/ui/ThemeToggle'
 
 const NAV = [
   {
@@ -17,9 +18,9 @@ const NAV = [
   {
     label: 'Pillars',
     items: [
-      { label: 'Social', href: '/social',  badge: '3',   badgeColor: 'text-[var(--v)] bg-[var(--vd)]' },
-      { label: 'CRM',    href: '/crm',     badge: '!',   badgeColor: 'text-[#F4845F] bg-[rgba(244,132,95,0.12)]' },
-      { label: 'Audio',  href: '/audio',   badge: '7',   badgeColor: 'text-[#2DD4BF] bg-[rgba(45,212,191,0.10)]' },
+      { label: 'Social', href: '/social',  badge: '3',  badgeStyle: { background: 'var(--vd)', color: 'var(--v)' } },
+      { label: 'CRM',    href: '/crm',     badge: '!',  badgeStyle: { background: 'var(--coral-dim)', color: 'var(--coral)' } },
+      { label: 'Audio',  href: '/audio',   badge: '7',  badgeStyle: { background: 'var(--teal-dim)', color: 'var(--teal)' } },
     ],
   },
   {
@@ -35,28 +36,55 @@ export function Sidebar() {
   const pathname = usePathname()
 
   return (
-    <aside className="
-      flex flex-col h-screen w-[216px] flex-shrink-0
-      bg-s1 border-r border-[var(--b1)]
-    ">
+    <aside style={{
+      display: 'flex',
+      flexDirection: 'column',
+      height: '100vh',
+      width: '220px',
+      flexShrink: 0,
+      background: 'var(--s1)',
+      borderRight: '1px solid var(--b1)',
+    }}>
       {/* Brand */}
-      <div className="flex items-center gap-[10px] h-[52px] px-[18px] border-b border-[var(--b1)] flex-shrink-0">
-        <Link href="/dashboard" className="flex items-center gap-[10px]">
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        height: '56px',
+        padding: '0 16px',
+        borderBottom: '1px solid var(--b1)',
+        flexShrink: 0,
+      }}>
+        <Link href="/dashboard" style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
           <SableMark size={26} />
-          <span className="font-serif text-[15px] text-t1 tracking-[-0.03em]">
-            sable
+          <span style={{
+            fontFamily: 'var(--serif)',
+            fontSize: '15px',
+            color: 'var(--t1)',
+            letterSpacing: '-0.03em',
+          }}>
+            Sable
           </span>
         </Link>
+        <ThemeToggle />
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 overflow-y-auto py-[20px] px-[10px] flex flex-col gap-[24px]">
+      <nav style={{ flex: 1, overflowY: 'auto', padding: '16px 8px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
         {NAV.map((group) => (
           <div key={group.label}>
-            <p className="text-[10px] font-medium tracking-[0.07em] uppercase text-t3 px-[8px] mb-[4px]">
+            <p style={{
+              fontSize: '10px',
+              fontWeight: 500,
+              letterSpacing: '0.07em',
+              textTransform: 'uppercase',
+              color: 'var(--t3)',
+              padding: '0 8px',
+              marginBottom: '4px',
+            }}>
               {group.label}
             </p>
-            <ul>
+            <ul style={{ listStyle: 'none' }}>
               {group.items.map((item) => {
                 const isActive = pathname === item.href ||
                   (item.href !== '/dashboard' && pathname.startsWith(item.href))
@@ -64,29 +92,53 @@ export function Sidebar() {
                   <li key={item.href}>
                     <Link
                       href={item.href}
-                      className={`
-                        flex items-center justify-between
-                        px-[10px] py-[7px] rounded-[7px]
-                        text-[13px] transition-all duration-[120ms]
-                        relative
-                        ${isActive
-                          ? 'text-t1 bg-s2'
-                          : 'text-t2 hover:text-t1 hover:bg-s2'
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        padding: '7px 10px',
+                        borderRadius: '7px',
+                        fontSize: '13.5px',
+                        color: isActive ? 'var(--t1)' : 'var(--t2)',
+                        background: isActive ? 'var(--s2)' : 'transparent',
+                        textDecoration: 'none',
+                        position: 'relative',
+                        transition: 'all 120ms',
+                        fontWeight: isActive ? 500 : 400,
+                      }}
+                      onMouseEnter={e => {
+                        if (!isActive) {
+                          (e.currentTarget as HTMLElement).style.background = 'var(--s2)'
+                          ;(e.currentTarget as HTMLElement).style.color = 'var(--t1)'
                         }
-                      `}
+                      }}
+                      onMouseLeave={e => {
+                        if (!isActive) {
+                          (e.currentTarget as HTMLElement).style.background = 'transparent'
+                          ;(e.currentTarget as HTMLElement).style.color = 'var(--t2)'
+                        }
+                      }}
                     >
                       {isActive && (
-                        <span className="
-                          absolute left-0 top-[6px] bottom-[6px]
-                          w-[2px] bg-[var(--v)] rounded-r-[2px]
-                        " />
+                        <span style={{
+                          position: 'absolute',
+                          left: 0,
+                          top: '6px',
+                          bottom: '6px',
+                          width: '2px',
+                          background: 'var(--v)',
+                          borderRadius: '0 2px 2px 0',
+                        }} />
                       )}
                       {item.label}
                       {'badge' in item && item.badge && (
-                        <span className={`
-                          text-[10px] font-medium px-[6px] py-[2px]
-                          rounded-[4px] ${item.badgeColor}
-                        `}>
+                        <span style={{
+                          fontSize: '10px',
+                          fontWeight: 600,
+                          padding: '2px 6px',
+                          borderRadius: '4px',
+                          ...item.badgeStyle,
+                        }}>
                           {item.badge}
                         </span>
                       )}
@@ -99,12 +151,21 @@ export function Sidebar() {
         ))}
       </nav>
 
-      {/* User */}
-      <div className="border-t border-[var(--b1)] p-[14px] flex items-center gap-[10px] flex-shrink-0">
+      {/* User footer */}
+      <div style={{
+        borderTop: '1px solid var(--b1)',
+        padding: '12px 14px',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '10px',
+        flexShrink: 0,
+      }}>
         <UserButton afterSignOutUrl="/" />
-        <div className="flex-1 min-w-0">
-          <p className="text-[12.5px] font-medium text-t1 truncate">My Account</p>
-          <p className="text-[11px] text-t3">Growth plan</p>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <p style={{ fontSize: '12.5px', fontWeight: 500, color: 'var(--t1)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            My Account
+          </p>
+          <p style={{ fontSize: '11px', color: 'var(--t3)' }}>Growth plan</p>
         </div>
       </div>
     </aside>

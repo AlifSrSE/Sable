@@ -4,33 +4,109 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ─── DARK MODE (default) ─── */
 :root {
-  --bg:        #0C0B14;
-  --s1:        #131221;
-  --s2:        #1A1927;
-  --s3:        #211F30;
-  --s4:        #2A2840;
-  --b0:        rgba(255,255,255,0.04);
-  --b1:        rgba(255,255,255,0.07);
-  --b2:        rgba(255,255,255,0.11);
-  --b3:        rgba(255,255,255,0.18);
-  --t1:        #EAE6FF;
-  --t2:        #8B88A8;
-  --t3:        #4A4760;
-  --t4:        #2E2C42;
-  --v:         #7C6AF7;
-  --vh:        #6A58E5;
-  --vd:        rgba(124,106,247,0.10);
-  --vm:        rgba(124,106,247,0.16);
-  --teal:      #2DD4BF;
-  --coral:     #F4845F;
-  --ok:        #4ADE80;
-  --err:       #F87171;
-  --serif:     'DM Serif Display', Georgia, serif;
-  --sans:      'DM Sans', system-ui, sans-serif;
+  --bg:         #0C0B14;
+  --s1:         #131221;
+  --s2:         #1A1927;
+  --s3:         #211F30;
+  --s4:         #2A2840;
+  --s5:         #343250;
+
+  --b0: rgba(255,255,255,0.04);
+  --b1: rgba(255,255,255,0.08);
+  --b2: rgba(255,255,255,0.13);
+  --b3: rgba(255,255,255,0.22);
+
+  --t1: #EAE6FF;
+  --t2: #A09DB8;
+  --t3: #5C5878;
+  --t4: #332F4A;
+
+  --v:   #7C6AF7;
+  --vh:  #6A58E5;
+  --vd:  rgba(124,106,247,0.12);
+  --vm:  rgba(124,106,247,0.20);
+
+  --teal:       #2DD4BF;
+  --teal-dim:   rgba(45,212,191,0.12);
+  --coral:      #F4845F;
+  --coral-dim:  rgba(244,132,95,0.12);
+  --amber:      #FCD34D;
+  --amber-dim:  rgba(252,211,77,0.10);
+
+  --ok:         #4ADE80;
+  --ok-dim:     rgba(74,222,128,0.12);
+  --err:        #F87171;
+  --err-dim:    rgba(248,113,113,0.12);
+
+  /* Input specific */
+  --input-bg:      #1A1927;
+  --input-border:  rgba(255,255,255,0.13);
+  --input-focus:   #7C6AF7;
+  --input-text:    #EAE6FF;
+  --input-placeholder: #5C5878;
+
+  /* Button */
+  --btn-secondary-bg:     rgba(255,255,255,0.07);
+  --btn-secondary-hover:  rgba(255,255,255,0.12);
+  --btn-secondary-text:   #A09DB8;
+  --btn-secondary-border: rgba(255,255,255,0.13);
+
+  --serif: 'DM Serif Display', Georgia, serif;
+  --sans:  'DM Sans', system-ui, sans-serif;
 }
 
-* {
+/* ─── LIGHT MODE ─── */
+[data-theme="light"] {
+  --bg:  #F4F3F8;
+  --s1:  #FFFFFF;
+  --s2:  #F0EFF6;
+  --s3:  #E6E4F0;
+  --s4:  #DAD8EC;
+  --s5:  #CCCAE0;
+
+  --b0: rgba(0,0,0,0.04);
+  --b1: rgba(0,0,0,0.08);
+  --b2: rgba(0,0,0,0.13);
+  --b3: rgba(0,0,0,0.22);
+
+  --t1: #0F0E1A;
+  --t2: #4A4760;
+  --t3: #8B88A8;
+  --t4: #C4C2D0;
+
+  --v:   #5B4AE8;
+  --vh:  #4A3AD4;
+  --vd:  rgba(91,74,232,0.10);
+  --vm:  rgba(91,74,232,0.18);
+
+  --teal:       #0D9488;
+  --teal-dim:   rgba(13,148,136,0.10);
+  --coral:      #E05A30;
+  --coral-dim:  rgba(224,90,48,0.10);
+  --amber:      #D97706;
+  --amber-dim:  rgba(217,119,6,0.10);
+
+  --ok:         #16A34A;
+  --ok-dim:     rgba(22,163,74,0.10);
+  --err:        #DC2626;
+  --err-dim:    rgba(220,38,38,0.10);
+
+  --input-bg:      #FFFFFF;
+  --input-border:  rgba(0,0,0,0.13);
+  --input-focus:   #5B4AE8;
+  --input-text:    #0F0E1A;
+  --input-placeholder: #8B88A8;
+
+  --btn-secondary-bg:     rgba(0,0,0,0.05);
+  --btn-secondary-hover:  rgba(0,0,0,0.08);
+  --btn-secondary-text:   #4A4760;
+  --btn-secondary-border: rgba(0,0,0,0.13);
+}
+
+/* ─── RESET ─── */
+*, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -40,16 +116,203 @@ html {
   background: var(--bg);
   color: var(--t1);
   font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  transition: background 200ms ease, color 200ms ease;
 }
 
-body {
-  min-height: 100vh;
-}
+body { min-height: 100vh; }
 
+/* ─── SCROLLBAR ─── */
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--s3); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--s4); }
+::-webkit-scrollbar-thumb { background: var(--s4); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--s5); }
 
+/* ─── SELECTION ─── */
 ::selection { background: var(--vm); color: var(--t1); }
+
+/* ─── FOCUS ─── */
+:focus-visible {
+  outline: 2px solid var(--v);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ─── GLOBAL COMPONENT CLASSES ─── */
+
+/* Inputs — consistent across all pages */
+.sable-input {
+  width: 100%;
+  height: 38px;
+  padding: 0 12px;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  color: var(--input-text);
+  font-size: 13.5px;
+  font-family: var(--sans);
+  outline: none;
+  transition: border-color 120ms, box-shadow 120ms;
+}
+
+.sable-input::placeholder { color: var(--input-placeholder); }
+.sable-input:hover  { border-color: var(--b2); }
+.sable-input:focus  {
+  border-color: var(--input-focus);
+  box-shadow: 0 0 0 3px var(--vd);
+}
+
+.sable-textarea {
+  width: 100%;
+  padding: 14px;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  color: var(--input-text);
+  font-size: 14px;
+  font-family: var(--sans);
+  font-weight: 300;
+  line-height: 1.75;
+  outline: none;
+  resize: none;
+  transition: border-color 120ms;
+}
+
+.sable-textarea::placeholder { color: var(--input-placeholder); }
+.sable-textarea:focus {
+  border-color: var(--input-focus);
+  box-shadow: 0 0 0 3px var(--vd);
+}
+
+/* Buttons */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 16px;
+  background: var(--v);
+  color: #fff;
+  font-size: 13.5px;
+  font-family: var(--sans);
+  font-weight: 500;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 120ms, transform 100ms;
+  white-space: nowrap;
+}
+.btn-primary:hover   { background: var(--vh); }
+.btn-primary:active  { transform: scale(0.98); }
+.btn-primary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 14px;
+  background: var(--btn-secondary-bg);
+  color: var(--btn-secondary-text);
+  font-size: 13.5px;
+  font-family: var(--sans);
+  font-weight: 400;
+  border: 1px solid var(--btn-secondary-border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 120ms;
+  white-space: nowrap;
+}
+.btn-secondary:hover {
+  background: var(--btn-secondary-hover);
+  color: var(--t1);
+  border-color: var(--b2);
+}
+.btn-secondary:active { transform: scale(0.98); }
+.btn-secondary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-sm {
+  height: 30px !important;
+  padding: 0 12px !important;
+  font-size: 12.5px !important;
+}
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 12px;
+  background: transparent;
+  color: var(--t3);
+  font-size: 13px;
+  font-family: var(--sans);
+  border: none;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: all 120ms;
+}
+.btn-ghost:hover {
+  background: var(--s2);
+  color: var(--t1);
+}
+
+/* Cards */
+.sable-card {
+  background: var(--s1);
+  border: 1px solid var(--b1);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* Page header */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 32px;
+  border-bottom: 1px solid var(--b1);
+  flex-shrink: 0;
+}
+
+.page-title {
+  font-family: var(--serif);
+  font-size: 1.7rem;
+  color: var(--t1);
+  letter-spacing: -0.035em;
+  line-height: 1.1;
+}
+
+.page-subtitle {
+  font-size: 12px;
+  color: var(--t3);
+  margin-top: 3px;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(8px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.animate-fade-in  { animation: fadeIn 200ms ease-out; }
+.animate-slide-in { animation: slideIn 200ms ease-out; }
+
+/* Theme transition */
+* { transition: background-color 150ms ease, border-color 150ms ease; }
+a, button { transition: all 120ms ease; }
