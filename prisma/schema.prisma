@@ -1,0 +1,633 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  directUrl  = env("DIRECT_URL")
+  extensions = [pgvector(map: "vector"), uuid_ossp(map: "uuid-ossp")]
+}
+
+enum Plan {
+  free
+  growth
+  business
+  agency
+}
+
+enum SubscriptionStatus {
+  trialing
+  active
+  past_due
+  canceled
+  unpaid
+}
+
+enum Platform {
+  instagram
+  linkedin
+  twitter
+  tiktok
+  facebook
+  pinterest
+}
+
+enum PostStatus {
+  draft
+  scheduled
+  publishing
+  published
+  partial
+  failed
+  canceled
+}
+
+enum DeliveryStatus {
+  pending
+  delivered
+  failed
+  skipped
+}
+
+enum InteractionType {
+  email
+  call
+  meeting
+  social_dm
+  note
+  post_engagement
+  linkedin_connection
+}
+
+enum InteractionDirection {
+  inbound
+  outbound
+}
+
+enum DealStatus {
+  open
+  won
+  lost
+  archived
+}
+
+enum CampaignStatus {
+  draft
+  scheduled
+  sending
+  sent
+  failed
+  canceled
+}
+
+enum AudioItemType {
+  podcast_episode
+  audiobook
+  news_brief
+  custom
+}
+
+enum AudioProcessingStatus {
+  pending
+  downloading
+  transcribing
+  summarizing
+  done
+  failed
+}
+
+enum ContactSource {
+  manual
+  social_import
+  email_import
+  csv_import
+  api
+}
+
+enum EmailStatus {
+  active
+  bounced
+  unsubscribed
+  spam_complaint
+  invalid
+}
+
+model User {
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email           String    @unique
+  name            String?
+  avatarUrl       String?   @map("avatar_url")
+  timezone        String    @default("UTC")
+  niche           String?
+  locale          String    @default("en")
+  voiceProfile    Json?     @map("voice_profile")
+  voiceConfidence Float     @default(0) @map("voice_confidence")
+  onboardingStep  Int       @default(0) @map("onboarding_step")
+  onboardedAt     DateTime? @map("onboarded_at")
+  deletedAt       DateTime? @map("deleted_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  subscription  Subscription?
+  orgMemberships OrgMember[]
+  socialAccounts SocialAccount[]
+  contentPosts   ContentPost[]
+  contacts       Contact[]
+  pipelines      Pipeline[]
+  emailCampaigns EmailCampaign[]
+  podcastSubs    PodcastSubscription[]
+  audioActivity  UserAudioActivity[]
+  dailyBriefs    DailyBrief[]
+  trendPrefs     UserTrendPreference[]
+  notifications  Notification[]
+  apiKeys        ApiKey[]
+
+  @@index([email])
+  @@index([deletedAt])
+  @@map("users")
+}
+
+model Organization {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String
+  slug      String   @unique
+  plan      Plan     @default(agency)
+  logoUrl   String?  @map("logo_url")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  members      OrgMember[]
+  subscription Subscription?
+
+  @@map("organizations")
+}
+
+model OrgMember {
+  id     String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  orgId  String @db.Uuid @map("org_id")
+  userId String @db.Uuid @map("user_id")
+  role   String @default("member")
+
+  org  Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  user User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([orgId, userId])
+  @@map("org_members")
+}
+
+model Subscription {
+  id                 String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId             String?            @unique @db.Uuid @map("user_id")
+  orgId              String?            @unique @db.Uuid @map("org_id")
+  stripeCustomerId   String             @unique @map("stripe_customer_id")
+  stripeSubId        String?            @unique @map("stripe_sub_id")
+  plan               Plan               @default(free)
+  status             SubscriptionStatus @default(active)
+  currentPeriodStart DateTime?          @map("current_period_start")
+  currentPeriodEnd   DateTime?          @map("current_period_end")
+  cancelAtPeriodEnd  Boolean            @default(false) @map("cancel_at_period_end")
+  canceledAt         DateTime?          @map("canceled_at")
+  trialEnd           DateTime?          @map("trial_end")
+  createdAt          DateTime           @default(now()) @map("created_at")
+  updatedAt          DateTime           @updatedAt @map("updated_at")
+
+  user User?         @relation(fields: [userId], references: [id])
+  org  Organization? @relation(fields: [orgId], references: [id])
+
+  @@map("subscriptions")
+}
+
+model ApiKey {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId     String    @db.Uuid @map("user_id")
+  name       String
+  keyHash    String    @unique @map("key_hash")
+  lastUsedAt DateTime? @map("last_used_at")
+  expiresAt  DateTime? @map("expires_at")
+  createdAt  DateTime  @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("api_keys")
+}
+
+model SocialAccount {
+  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId         String    @db.Uuid @map("user_id")
+  platform       Platform
+  platformUserId String    @map("platform_user_id")
+  handle         String
+  displayName    String    @map("display_name")
+  avatarUrl      String?   @map("avatar_url")
+  accessToken    String    @map("access_token")
+  refreshToken   String?   @map("refresh_token")
+  tokenExpiresAt DateTime? @map("token_expires_at")
+  scopes         String[]
+  isActive       Boolean   @default(true) @map("is_active")
+  followerCount  Int       @default(0) @map("follower_count")
+  followingCount Int       @default(0) @map("following_count")
+  lastSyncedAt   DateTime? @map("last_synced_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  user       User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  deliveries PostDelivery[]
+
+  @@unique([userId, platform])
+  @@index([userId, isActive])
+  @@map("social_accounts")
+}
+
+model ContentPost {
+  id            String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId        String     @db.Uuid @map("user_id")
+  body          String
+  mediaUrls     String[]   @map("media_urls")
+  platforms     Platform[]
+  status        PostStatus @default(draft)
+  scheduledAt   DateTime?  @map("scheduled_at")
+  publishedAt   DateTime?  @map("published_at")
+  aiGenerated   Boolean    @default(false) @map("ai_generated")
+  aiPrompt      String?    @map("ai_prompt")
+  aiModel       String?    @map("ai_model")
+  sourceTrendId String?    @db.Uuid @map("source_trend_id")
+  sourceAudioId String?    @db.Uuid @map("source_audio_id")
+  createdAt     DateTime   @default(now()) @map("created_at")
+  updatedAt     DateTime   @updatedAt @map("updated_at")
+
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  deliveries  PostDelivery[]
+  sourceTrend TrendSignal?   @relation(fields: [sourceTrendId], references: [id])
+  sourceAudio AudioItem?     @relation(fields: [sourceAudioId], references: [id])
+  spawnedFrom UserAudioActivity[] @relation("CreatedFromAudio")
+
+  @@index([userId, status])
+  @@index([userId, scheduledAt])
+  @@index([status, scheduledAt])
+  @@map("content_posts")
+}
+
+model PostDelivery {
+  id              String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  postId          String         @db.Uuid @map("post_id")
+  socialAccountId String         @db.Uuid @map("social_account_id")
+  platform        Platform
+  platformBody    String?        @map("platform_body")
+  status          DeliveryStatus @default(pending)
+  platformPostId  String?        @map("platform_post_id")
+  errorCode       String?        @map("error_code")
+  errorMessage    String?        @map("error_message")
+  retryCount      Int            @default(0) @map("retry_count")
+  jobId           String?        @map("job_id")
+  deliveredAt     DateTime?      @map("delivered_at")
+  createdAt       DateTime       @default(now()) @map("created_at")
+  updatedAt       DateTime       @updatedAt @map("updated_at")
+
+  post          ContentPost   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  socialAccount SocialAccount @relation(fields: [socialAccountId], references: [id])
+  analytics     PostAnalytics[]
+
+  @@unique([postId, platform])
+  @@index([status, deliveredAt])
+  @@map("post_deliveries")
+}
+
+model PostAnalytics {
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  deliveryId    String   @db.Uuid @map("delivery_id")
+  snapshotAt    DateTime @map("snapshot_at")
+  impressions   Int      @default(0)
+  reach         Int      @default(0)
+  likes         Int      @default(0)
+  comments      Int      @default(0)
+  shares        Int      @default(0)
+  saves         Int      @default(0)
+  clicks        Int      @default(0)
+  profileVisits Int      @default(0) @map("profile_visits")
+  engagementRate Float?  @map("engagement_rate")
+
+  delivery PostDelivery @relation(fields: [deliveryId], references: [id], onDelete: Cascade)
+
+  @@index([deliveryId, snapshotAt])
+  @@map("post_analytics")
+}
+
+model TrendSignal {
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  topic          String
+  niche          String?
+  source         String
+  sourceUrl      String?  @map("source_url")
+  velocityScore  Float    @default(0) @map("velocity_score")
+  peakScore      Float    @default(0) @map("peak_score")
+  relevanceCache Json?    @map("relevance_cache")
+  capturedAt     DateTime @map("captured_at")
+  expiresAt      DateTime @map("expires_at")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  posts     ContentPost[]
+  userPrefs UserTrendPreference[]
+
+  @@index([niche, expiresAt])
+  @@map("trend_signals")
+}
+
+model UserTrendPreference {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId    String   @db.Uuid @map("user_id")
+  trendId   String   @db.Uuid @map("trend_id")
+  reaction  String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user  User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  trend TrendSignal @relation(fields: [trendId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, trendId])
+  @@map("user_trend_preferences")
+}
+
+model Contact {
+  id              String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId          String        @db.Uuid @map("user_id")
+  name            String
+  email           String?
+  phone           String?
+  company         String?
+  role            String?
+  linkedinUrl     String?       @map("linkedin_url")
+  website         String?
+  avatarUrl       String?       @map("avatar_url")
+  location        String?
+  tags            String[]
+  source          ContactSource @default(manual)
+  emailStatus     EmailStatus   @default(active) @map("email_status")
+  socialHandle    String?       @map("social_handle")
+  socialPlatform  Platform?     @map("social_platform")
+  lastContactedAt DateTime?     @map("last_contacted_at")
+  nextFollowUpAt  DateTime?     @map("next_follow_up_at")
+  relationshipScore Float?      @map("relationship_score")
+  notes           String?
+  deletedAt       DateTime?     @map("deleted_at")
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
+
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  interactions    Interaction[]
+  deals           Deal[]
+  emailRecipients EmailRecipient[]
+  taggedAudio     UserAudioActivity[] @relation("TaggedContact")
+
+  @@index([userId, deletedAt])
+  @@index([userId, lastContactedAt])
+  @@map("contacts")
+}
+
+model Interaction {
+  id           String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  contactId    String               @db.Uuid @map("contact_id")
+  userId       String               @db.Uuid @map("user_id")
+  type         InteractionType
+  direction    InteractionDirection @default(outbound)
+  subject      String?
+  body         String?
+  sentiment    String?
+  aiSuggested  Boolean              @default(false) @map("ai_suggested")
+  sourcePostId String?              @db.Uuid @map("source_post_id")
+  occurredAt   DateTime             @map("occurred_at")
+  createdAt    DateTime             @default(now()) @map("created_at")
+
+  contact Contact @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@index([contactId, occurredAt])
+  @@index([userId, occurredAt])
+  @@map("interactions")
+}
+
+model Pipeline {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId    String   @db.Uuid @map("user_id")
+  name      String
+  stages    Json     @default("[]")
+  isDefault Boolean  @default(false) @map("is_default")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  deals Deal[]
+
+  @@map("pipelines")
+}
+
+model Deal {
+  id         String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  pipelineId String     @db.Uuid @map("pipeline_id")
+  contactId  String     @db.Uuid @map("contact_id")
+  title      String
+  value      Decimal?   @db.Decimal(12, 2)
+  currency   String     @default("USD")
+  stageId    String     @map("stage_id")
+  probability Float?
+  closeDate  DateTime?  @map("close_date")
+  status     DealStatus @default(open)
+  lostReason String?    @map("lost_reason")
+  notes      String?
+  closedAt   DateTime?  @map("closed_at")
+  createdAt  DateTime   @default(now()) @map("created_at")
+  updatedAt  DateTime   @updatedAt @map("updated_at")
+
+  pipeline Pipeline @relation(fields: [pipelineId], references: [id], onDelete: Cascade)
+  contact  Contact  @relation(fields: [contactId], references: [id])
+
+  @@index([pipelineId, status])
+  @@map("deals")
+}
+
+model EmailCampaign {
+  id              String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId          String         @db.Uuid @map("user_id")
+  name            String
+  subject         String
+  previewText     String?        @map("preview_text")
+  bodyHtml        String         @map("body_html")
+  bodyText        String         @map("body_text")
+  status          CampaignStatus @default(draft)
+  recipientFilter Json           @map("recipient_filter")
+  recipientCount  Int            @default(0) @map("recipient_count")
+  sourceAudioId   String?        @db.Uuid @map("source_audio_id")
+  scheduledAt     DateTime?      @map("scheduled_at")
+  sentAt          DateTime?      @map("sent_at")
+  sentCount       Int            @default(0) @map("sent_count")
+  openCount       Int            @default(0) @map("open_count")
+  clickCount      Int            @default(0) @map("click_count")
+  bounceCount     Int            @default(0) @map("bounce_count")
+  unsubCount      Int            @default(0) @map("unsub_count")
+  createdAt       DateTime       @default(now()) @map("created_at")
+  updatedAt       DateTime       @updatedAt @map("updated_at")
+
+  user       User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  recipients EmailRecipient[]
+
+  @@index([userId, status])
+  @@map("email_campaigns")
+}
+
+model EmailRecipient {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  campaignId String    @db.Uuid @map("campaign_id")
+  contactId  String    @db.Uuid @map("contact_id")
+  email      String
+  status     String    @default("pending")
+  sentAt     DateTime? @map("sent_at")
+  openedAt   DateTime? @map("opened_at")
+  clickedAt  DateTime? @map("clicked_at")
+
+  campaign EmailCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  contact  Contact       @relation(fields: [contactId], references: [id])
+
+  @@unique([campaignId, contactId])
+  @@map("email_recipients")
+}
+
+model PodcastSubscription {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId        String    @db.Uuid @map("user_id")
+  feedUrl       String    @map("feed_url")
+  title         String
+  description   String?
+  coverUrl      String?   @map("cover_url")
+  author        String?
+  categories    String[]
+  lastCheckedAt DateTime? @map("last_checked_at")
+  isActive      Boolean   @default(true) @map("is_active")
+  createdAt     DateTime  @default(now()) @map("created_at")
+
+  user  User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items AudioItem[]
+
+  @@unique([userId, feedUrl])
+  @@map("podcast_subscriptions")
+}
+
+model AudioItem {
+  id               String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  subscriptionId   String?               @db.Uuid @map("subscription_id")
+  type             AudioItemType
+  title            String
+  description      String?
+  audioUrl         String                @map("audio_url")
+  coverUrl         String?               @map("cover_url")
+  durationSeconds  Int?                  @map("duration_seconds")
+  transcript       String?
+  summary          Json?
+  processingStatus AudioProcessingStatus @default(pending) @map("processing_status")
+  processingError  String?               @map("processing_error")
+  whisperModel     String?               @map("whisper_model")
+  publishedAt      DateTime?             @map("published_at")
+  processedAt      DateTime?             @map("processed_at")
+  createdAt        DateTime              @default(now()) @map("created_at")
+
+  subscription PodcastSubscription? @relation(fields: [subscriptionId], references: [id])
+  userActivity UserAudioActivity[]
+  briefItems   DailyBriefItem[]
+  spawnedPosts ContentPost[]
+
+  @@index([subscriptionId, publishedAt])
+  @@index([processingStatus])
+  @@map("audio_items")
+}
+
+model UserAudioActivity {
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId          String    @db.Uuid @map("user_id")
+  audioItemId     String    @db.Uuid @map("audio_item_id")
+  listenedPct     Float     @default(0) @map("listened_pct")
+  listenedSeconds Int       @default(0) @map("listened_seconds")
+  completedAt     DateTime? @map("completed_at")
+  bookmarks       Json      @default("[]")
+  crmContactId    String?   @db.Uuid @map("crm_contact_id")
+  createdPostId   String?   @db.Uuid @map("created_post_id")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  audioItem   AudioItem    @relation(fields: [audioItemId], references: [id])
+  crmContact  Contact?     @relation("TaggedContact", fields: [crmContactId], references: [id])
+  createdPost ContentPost? @relation("CreatedFromAudio", fields: [createdPostId], references: [id])
+
+  @@unique([userId, audioItemId])
+  @@index([userId, updatedAt])
+  @@map("user_audio_activity")
+}
+
+model DailyBrief {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId      String    @db.Uuid @map("user_id")
+  date        DateTime  @db.Date
+  summaryText String?   @map("summary_text")
+  audioTtsUrl String?   @map("audio_tts_url")
+  openedAt    DateTime? @map("opened_at")
+  generatedAt DateTime  @default(now()) @map("generated_at")
+
+  user  User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items DailyBriefItem[]
+
+  @@unique([userId, date])
+  @@map("daily_briefs")
+}
+
+model DailyBriefItem {
+  id      String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  briefId String  @db.Uuid @map("brief_id")
+  audioId String  @db.Uuid @map("audio_id")
+  order   Int
+  reason  String?
+
+  brief DailyBrief @relation(fields: [briefId], references: [id], onDelete: Cascade)
+  audio AudioItem  @relation(fields: [audioId], references: [id])
+
+  @@map("daily_brief_items")
+}
+
+model Notification {
+  id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId    String    @db.Uuid @map("user_id")
+  type      String
+  title     String
+  body      String?
+  data      Json?
+  readAt    DateTime? @map("read_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt])
+  @@index([userId, createdAt])
+  @@map("notifications")
+}
+
+model FeatureFlag {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  key        String   @unique
+  enabled    Boolean  @default(false)
+  rolloutPct Float    @default(0) @map("rollout_pct")
+  userIds    String[] @map("user_ids")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@map("feature_flags")
+}
+
+model JobLog {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  jobType    String   @map("job_type")
+  jobId      String   @map("job_id")
+  status     String
+  durationMs Int?     @map("duration_ms")
+  error      String?
+  meta       Json?
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@index([jobType, createdAt])
+  @@map("job_logs")
+}
