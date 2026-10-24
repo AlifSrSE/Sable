@@ -6,9 +6,8 @@
 <title>Sable — Your presence, amplified</title>
 <meta name="description" content="What you learn becomes what you say. Social, CRM, and audio intelligence in one platform built for people who think seriously about their presence.">
 <meta property="og:title" content="Sable — Your presence, amplified">
-<meta property="og:description" content="What you learn becomes what you say. Social, CRM, and audio intelligence in one platform.">
+<meta property="og:description" content="What you learn becomes what you say.">
 <meta property="og:type" content="website">
-<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
@@ -42,56 +41,67 @@
 html { background: var(--bg); color: var(--t1); font-family: var(--sans); font-size: 15px; line-height: 1.6; -webkit-font-smoothing: antialiased; scroll-behavior: smooth; }
 body { overflow-x: hidden; }
 a { color: inherit; text-decoration: none; }
-::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--s4); border-radius: 3px; }
+::-webkit-scrollbar-thumb { background: var(--s4); border-radius: 2px; }
 ::selection { background: var(--vm); }
 
-/* NAV */
+/* ── CANVAS BACKGROUND ── */
+#bg-canvas {
+  position: fixed; inset: 0; z-index: 0;
+  pointer-events: none;
+}
+
+/* ── NAV ── */
 nav {
   position: fixed; top: 0; left: 0; right: 0; z-index: 100;
   display: flex; align-items: center; justify-content: space-between;
   padding: 0 40px; height: 58px;
-  background: rgba(11,10,19,0.88);
-  backdrop-filter: blur(18px);
+  background: rgba(11,10,19,0.75);
+  backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--b1);
+  transition: all 300ms;
 }
+nav.scrolled { background: rgba(11,10,19,0.95); border-bottom-color: var(--b2); }
+
 .nav-brand { display: flex; align-items: center; gap: 10px; }
-.nav-mark { width: 30px; height: 30px; background: var(--s1); border: 1px solid var(--b2); border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+.nav-mark {
+  width: 30px; height: 30px; background: var(--s1);
+  border: 1px solid var(--b2); border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  transition: transform 300ms, box-shadow 300ms;
+}
+.nav-mark:hover { transform: rotate(-5deg) scale(1.08); box-shadow: 0 0 20px rgba(124,106,247,0.3); }
 .nav-word { font-family: var(--serif); font-size: 16px; color: var(--t1); letter-spacing: -0.025em; }
 .nav-links { display: flex; gap: 28px; }
-.nav-links a { font-size: 13.5px; color: var(--t3); transition: color 120ms; }
+.nav-links a {
+  font-size: 13.5px; color: var(--t3); transition: color 120ms;
+  position: relative; padding-bottom: 2px;
+}
+.nav-links a::after {
+  content: ''; position: absolute; bottom: -2px; left: 0; right: 100%;
+  height: 1px; background: var(--v); transition: right 250ms ease;
+}
 .nav-links a:hover { color: var(--t1); }
-.nav-cta { display: flex; gap: 10px; align-items: center; }
+.nav-links a:hover::after { right: 0; }
 
-.btn { display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 18px; border-radius: 8px; font-size: 13.5px; font-weight: 400; font-family: var(--sans); cursor: pointer; border: none; transition: all 120ms; letter-spacing: -0.01em; white-space: nowrap; }
+.btn { display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 18px; border-radius: 8px; font-size: 13.5px; font-weight: 400; font-family: var(--sans); cursor: pointer; border: none; transition: all 150ms; letter-spacing: -0.01em; white-space: nowrap; }
 .btn-ghost  { background: transparent; color: var(--t2); border: 1px solid var(--b2); }
-.btn-ghost:hover  { background: var(--s2); color: var(--t1); }
+.btn-ghost:hover  { background: var(--s2); color: var(--t1); border-color: var(--b3); transform: translateY(-1px); }
 .btn-violet { background: var(--v); color: #fff; }
-.btn-violet:hover { background: var(--vh); }
+.btn-violet:hover { background: var(--vh); transform: translateY(-1px); box-shadow: 0 8px 24px rgba(124,106,247,0.35); }
 .btn-vl { background: var(--v); color: #fff; height: 46px; padding: 0 28px; font-size: 15px; border-radius: 10px; }
-.btn-vl:hover { background: var(--vh); }
+.btn-vl:hover { background: var(--vh); transform: translateY(-2px); box-shadow: 0 12px 32px rgba(124,106,247,0.4); }
 
-/* HERO */
+/* ── HERO ── */
 .hero {
-  min-height: 100vh; display: flex; flex-direction: column;
+  min-height: 100vh;
+  display: flex; flex-direction: column;
   align-items: center; justify-content: center;
   text-align: center; padding: 120px 40px 80px;
   position: relative; overflow: hidden;
 }
-.hero::before {
-  content: ''; position: absolute; inset: 0;
-  background-image: linear-gradient(rgba(124,106,247,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(124,106,247,0.03) 1px, transparent 1px);
-  background-size: 60px 60px;
-  mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%);
-}
-.hero::after {
-  content: ''; position: absolute;
-  width: 700px; height: 700px; border-radius: 50%;
-  background: radial-gradient(circle, rgba(124,106,247,0.07) 0%, transparent 70%);
-  top: 50%; left: 50%; transform: translate(-50%, -60%);
-  pointer-events: none;
-}
+
 .hero-inner { position: relative; z-index: 1; max-width: 820px; }
 
 .hero-badge {
@@ -99,82 +109,178 @@ nav {
   font-size: 12px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase;
   color: var(--v); background: var(--vd); border: 1px solid var(--vm);
   padding: 5px 14px; border-radius: 20px; margin-bottom: 32px;
+  animation: badgeFade 800ms ease-out both;
+}
+@keyframes badgeFade {
+  from { opacity: 0; transform: translateY(-10px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 .badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--v); animation: pulse 2s ease-in-out infinite; }
-@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.8)} }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.7)} }
 
-.hero-h1 { font-family: var(--serif); font-size: clamp(3.2rem, 7vw, 5.5rem); font-weight: 400; letter-spacing: -0.045em; line-height: 1.05; color: var(--t1); margin-bottom: 24px; }
+.hero-h1 {
+  font-family: var(--serif);
+  font-size: clamp(3.2rem, 7vw, 5.5rem);
+  font-weight: 400; letter-spacing: -0.045em; line-height: 1.05;
+  color: var(--t1); margin-bottom: 24px;
+  animation: heroText 900ms ease-out 100ms both;
+}
+@keyframes heroText {
+  from { opacity: 0; transform: translateY(30px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
 .hero-h1 em { font-style: italic; color: var(--v); }
-.hero-sub { font-size: clamp(1rem, 2vw, 1.15rem); color: var(--t2); line-height: 1.75; max-width: 520px; margin: 0 auto 40px; font-weight: 300; }
 
-.wl-form { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px; }
-.wl-input { height: 46px; padding: 0 18px; min-width: 280px; background: var(--s2); border: 1px solid var(--b2); border-radius: 10px; color: var(--t1); font-size: 14px; font-family: var(--sans); outline: none; transition: border 120ms, box-shadow 120ms; }
+/* Typing cursor */
+.cursor-blink {
+  display: inline-block; width: 3px; height: 0.85em;
+  background: var(--v); border-radius: 2px; vertical-align: text-bottom;
+  margin-left: 3px; animation: cursorBlink 1s step-end infinite;
+}
+@keyframes cursorBlink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+.hero-sub {
+  font-size: clamp(1rem, 2vw, 1.15rem); color: var(--t2); line-height: 1.75;
+  max-width: 520px; margin: 0 auto 40px; font-weight: 300;
+  animation: heroText 900ms ease-out 200ms both;
+}
+
+.wl-form {
+  display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px;
+  animation: heroText 900ms ease-out 300ms both;
+}
+.wl-input {
+  height: 46px; padding: 0 18px; min-width: 280px;
+  background: var(--s2); border: 1px solid var(--b2);
+  border-radius: 10px; color: var(--t1); font-size: 14px;
+  font-family: var(--sans); outline: none;
+  transition: border 150ms, box-shadow 150ms, background 150ms;
+}
 .wl-input::placeholder { color: var(--t3); }
-.wl-input:focus { border-color: var(--v); box-shadow: 0 0 0 3px var(--vd); }
+.wl-input:focus { border-color: var(--v); box-shadow: 0 0 0 3px var(--vd); background: var(--s3); }
 
-.trust { display: flex; align-items: center; justify-content: center; gap: 20px; flex-wrap: wrap; }
+.trust {
+  display: flex; align-items: center; justify-content: center; gap: 20px; flex-wrap: wrap;
+  animation: heroText 900ms ease-out 400ms both;
+}
 .trust-item { display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--t3); }
 .trust-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--t4); }
 
 .success-box { display: none; flex-direction: column; align-items: center; gap: 10px; }
-.success-box.show { display: flex; }
-.success-icon { width: 48px; height: 48px; border-radius: 50%; background: rgba(74,222,128,0.12); display: flex; align-items: center; justify-content: center; }
+.success-box.show { display: flex; animation: successPop 400ms cubic-bezier(0.34,1.56,0.64,1) both; }
+@keyframes successPop { from{opacity:0;transform:scale(.8)} to{opacity:1;transform:scale(1)} }
+.success-icon { width: 52px; height: 52px; border-radius: 50%; background: rgba(74,222,128,0.12); border: 1px solid rgba(74,222,128,0.3); display: flex; align-items: center; justify-content: center; }
 
-/* PREVIEW */
-.hero-preview { max-width: 700px; margin: 64px auto 0; position: relative; z-index: 1; }
-.preview-win { background: var(--s1); border: 1px solid var(--b2); border-radius: 14px; overflow: hidden; box-shadow: 0 40px 100px rgba(0,0,0,0.6), 0 0 0 1px rgba(124,106,247,0.08); }
+/* Hero preview */
+.hero-preview {
+  max-width: 700px; margin: 64px auto 0;
+  position: relative; z-index: 1;
+  animation: heroText 1000ms ease-out 500ms both;
+}
+
+.preview-float {
+  animation: float 6s ease-in-out infinite;
+}
+@keyframes float {
+  0%,100% { transform: translateY(0); }
+  50%      { transform: translateY(-12px); }
+}
+
+.preview-win {
+  background: var(--s1); border: 1px solid var(--b2);
+  border-radius: 14px; overflow: hidden;
+  box-shadow:
+    0 40px 80px rgba(0,0,0,0.6),
+    0 0 0 1px rgba(124,106,247,0.08),
+    0 0 80px rgba(124,106,247,0.04);
+  transition: box-shadow 400ms, transform 400ms;
+}
+.preview-win:hover {
+  box-shadow: 0 60px 120px rgba(0,0,0,0.7), 0 0 0 1px rgba(124,106,247,0.15), 0 0 100px rgba(124,106,247,0.08);
+  transform: translateY(-6px);
+}
+
 .preview-bar { height: 36px; background: var(--s2); border-bottom: 1px solid var(--b1); display: flex; align-items: center; padding: 0 16px; gap: 6px; }
 .pw-dot { width: 9px; height: 9px; border-radius: 50%; }
 .preview-url { flex: 1; text-align: center; font-size: 11px; color: var(--t3); background: var(--s3); border-radius: 5px; padding: 3px 12px; margin: 0 20px; font-family: monospace; }
 .preview-body { display: grid; grid-template-columns: 170px 1fr; }
 .preview-sb { background: var(--s2); border-right: 1px solid var(--b1); padding: 16px 10px; }
 .pnav-label { font-size: 9px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--t3); padding: 0 8px; margin-bottom: 4px; display: block; }
-.pnav-item { display: flex; align-items: center; justify-content: space-between; padding: 6px 8px; border-radius: 6px; font-size: 11.5px; color: var(--t2); margin-bottom: 1px; }
+.pnav-item { display: flex; align-items: center; justify-content: space-between; padding: 6px 8px; border-radius: 6px; font-size: 11.5px; color: var(--t2); margin-bottom: 1px; transition: background 150ms; }
+.pnav-item:hover { background: var(--s3); color: var(--t1); }
 .pnav-item.on { background: var(--s3); color: var(--t1); position: relative; }
 .pnav-item.on::before { content: ''; position: absolute; left: 0; top: 5px; bottom: 5px; width: 2px; background: var(--v); border-radius: 0 2px 2px 0; }
 .pnav-badge { font-size: 9px; font-weight: 600; padding: 1px 5px; border-radius: 3px; }
 .nb-v { background: var(--vd); color: var(--v); }
 .nb-c { background: rgba(244,132,95,.12); color: var(--coral); }
 .nb-t { background: rgba(45,212,191,.10); color: var(--teal); }
+
 .preview-main { padding: 16px; }
 .p-greeting { font-family: var(--serif); font-size: 18px; color: var(--t1); letter-spacing: -.03em; margin-bottom: 2px; }
 .p-date { font-size: 10px; color: var(--t3); margin-bottom: 14px; }
 .p-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 12px; }
-.p-stat { background: var(--s2); border: 1px solid var(--b1); border-radius: 8px; padding: 10px; }
+.p-stat { background: var(--s2); border: 1px solid var(--b1); border-radius: 8px; padding: 10px; transition: border-color 150ms, transform 150ms; cursor: default; }
+.p-stat:hover { border-color: var(--b3); transform: translateY(-2px); }
 .p-stat-v { font-family: var(--serif); font-size: 22px; color: var(--t1); letter-spacing: -.04em; line-height: 1; }
 .p-stat-l { font-size: 9px; color: var(--t3); margin-top: 3px; }
 .p-stat-d { font-size: 9px; color: var(--ok); margin-top: 2px; }
 .p-panel { background: var(--s2); border: 1px solid var(--b1); border-radius: 8px; overflow: hidden; }
 .p-panel-h { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; border-bottom: 1px solid var(--b0); font-size: 10.5px; font-weight: 500; color: var(--t2); }
-.p-post-row { display: flex; align-items: center; gap: 8px; padding: 7px 12px; border-bottom: 1px solid var(--b0); }
+.p-post-row { display: flex; align-items: center; gap: 8px; padding: 7px 12px; border-bottom: 1px solid var(--b0); transition: background 120ms; cursor: default; }
+.p-post-row:hover { background: var(--s3); }
 .p-post-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
 .p-post-text { flex: 1; font-size: 10.5px; color: var(--t2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .p-post-tag { font-size: 9px; font-weight: 600; padding: 1px 5px; border-radius: 3px; flex-shrink: 0; }
 .pt-s { background: var(--vd); color: var(--v); }
 .pt-d { background: var(--s4); color: var(--t3); }
 .p-ai-row { display: flex; align-items: flex-start; gap: 8px; padding: 8px 12px; background: var(--s3); font-size: 10.5px; color: var(--t2); line-height: 1.5; }
-.ai-gem { width: 18px; height: 18px; border-radius: 5px; background: var(--vd); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.ai-gem { width: 18px; height: 18px; border-radius: 5px; background: var(--vd); display: flex; align-items: center; justify-content: center; flex-shrink: 0; animation: pulse 3s ease-in-out infinite; }
 
-/* SECTIONS */
-.sec { padding: 100px 40px; }
+/* ── SECTIONS ── */
+.sec { padding: 100px 40px; position: relative; z-index: 1; }
 .sec-inner { max-width: 1040px; margin: 0 auto; }
 .sec-label { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--v); margin-bottom: 14px; display: block; }
 .sec-h2 { font-family: var(--serif); font-size: clamp(2rem,4vw,3.2rem); font-weight: 400; letter-spacing: -.035em; line-height: 1.1; color: var(--t1); margin-bottom: 16px; }
 .sec-sub { font-size: 1rem; color: var(--t2); line-height: 1.75; max-width: 480px; font-weight: 300; }
 
-/* PROBLEM */
+/* Scroll reveal */
+.reveal { opacity: 0; transform: translateY(30px); transition: opacity 700ms ease, transform 700ms ease; }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+.reveal-left { opacity: 0; transform: translateX(-30px); transition: opacity 700ms ease, transform 700ms ease; }
+.reveal-left.visible { opacity: 1; transform: translateX(0); }
+.reveal-right { opacity: 0; transform: translateX(30px); transition: opacity 700ms ease, transform 700ms ease; }
+.reveal-right.visible { opacity: 1; transform: translateX(0); }
+.reveal-scale { opacity: 0; transform: scale(0.92); transition: opacity 700ms ease, transform 700ms ease; }
+.reveal-scale.visible { opacity: 1; transform: scale(1); }
+
+/* Stagger children */
+.stagger > * { opacity: 0; transform: translateY(20px); transition: opacity 500ms ease, transform 500ms ease; }
+.stagger.visible > *:nth-child(1) { opacity: 1; transform: translateY(0); transition-delay: 0ms; }
+.stagger.visible > *:nth-child(2) { opacity: 1; transform: translateY(0); transition-delay: 80ms; }
+.stagger.visible > *:nth-child(3) { opacity: 1; transform: translateY(0); transition-delay: 160ms; }
+.stagger.visible > *:nth-child(4) { opacity: 1; transform: translateY(0); transition-delay: 240ms; }
+.stagger.visible > *:nth-child(5) { opacity: 1; transform: translateY(0); transition-delay: 320ms; }
+.stagger.visible > *:nth-child(6) { opacity: 1; transform: translateY(0); transition-delay: 400ms; }
+
+/* ── PROBLEM ── */
 .prob-sec { background: var(--s1); border-top: 1px solid var(--b1); border-bottom: 1px solid var(--b1); }
 .prob-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
 .prob-a { padding: 60px 60px 60px 0; border-right: 1px solid var(--b1); }
 .prob-b { padding: 60px 0 60px 60px; }
 .prob-list { display: flex; flex-direction: column; gap: 24px; margin-top: 8px; }
-.prob-item { display: flex; gap: 16px; align-items: flex-start; }
+.prob-item {
+  display: flex; gap: 16px; align-items: flex-start;
+  padding: 16px; border-radius: 10px; border: 1px solid transparent;
+  transition: border-color 200ms, background 200ms;
+  cursor: default;
+}
+.prob-item:hover { border-color: var(--b1); background: rgba(255,255,255,0.02); }
 .prob-num { font-family: var(--serif); font-size: 2.8rem; color: var(--b2); line-height: 1; flex-shrink: 0; width: 44px; text-align: right; margin-top: -4px; }
 .prob-text h4 { font-size: 14px; font-weight: 500; color: var(--t1); margin-bottom: 4px; }
 .prob-text p  { font-size: 13px; color: var(--t3); line-height: 1.65; }
 
-/* PILLARS */
-.pillar-row { display: grid; align-items: start; border-top: 1px solid var(--b1); padding: 64px 0; gap: 64px; }
+/* ── PILLARS ── */
+.pillar-row { display: grid; align-items: start; border-top: 1px solid var(--b1); padding: 72px 0; gap: 64px; }
 .pillar-row:first-child { border-top: none; padding-top: 0; }
 .pl-la { grid-template-columns: 2fr 3fr; }
 .pl-lb { grid-template-columns: 3fr 2fr; }
@@ -186,48 +292,90 @@ nav {
 .p-title { font-family: var(--serif); font-size: clamp(1.8rem,3vw,2.4rem); color: var(--t1); line-height: 1.1; letter-spacing: -.035em; margin-bottom: 16px; }
 .p-desc  { font-size: .95rem; color: var(--t2); line-height: 1.8; margin-bottom: 24px; font-weight: 300; }
 .p-feats { display: flex; flex-direction: column; }
-.p-feat  { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid var(--b0); font-size: 13.5px; color: var(--t2); }
-.p-feat::before { content: ''; width: 18px; height: 1px; background: var(--t4); flex-shrink: 0; }
+.p-feat  {
+  display: flex; align-items: center; gap: 12px; padding: 10px 0;
+  border-top: 1px solid var(--b0); font-size: 13.5px; color: var(--t2);
+  transition: color 150ms, padding-left 150ms;
+}
+.p-feat:hover { color: var(--t1); padding-left: 4px; }
+.p-feat::before { content: ''; width: 18px; height: 1px; background: var(--t4); flex-shrink: 0; transition: background 150ms, width 150ms; }
+.p-feat:hover::before { background: var(--v); width: 24px; }
 .p-feat strong { font-weight: 500; color: var(--t1); }
 
-.p-panel { background: var(--s1); border: 1px solid var(--b2); border-radius: 14px; overflow: hidden; }
+/* Pillar panel */
+.p-panel {
+  background: var(--s1); border: 1px solid var(--b2);
+  border-radius: 14px; overflow: hidden;
+  transition: transform 300ms, box-shadow 300ms;
+}
+.p-panel:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 0 1px rgba(124,106,247,0.1);
+}
 .pp-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid var(--b1); font-size: 12.5px; font-weight: 500; color: var(--t1); }
 .pp-sub { font-size: 11.5px; color: var(--t3); }
 .pp-body { padding: 14px; display: flex; flex-direction: column; gap: 10px; }
 
-.trend-card { background: var(--s2); border: 1px solid var(--b1); border-radius: 10px; padding: 14px; }
+.trend-card {
+  background: var(--s2); border: 1px solid var(--b1); border-radius: 10px; padding: 14px;
+  transition: border-color 150ms, transform 150ms;
+}
+.trend-card:hover { border-color: var(--b3); transform: translateX(3px); }
 .trend-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 8px; }
 .trend-topic { font-size: 13px; font-weight: 500; color: var(--t1); line-height: 1.4; max-width: 220px; }
 .trend-vel { font-size: 11px; color: var(--ok); font-weight: 600; display: flex; align-items: center; gap: 3px; }
 .trend-quote { font-size: 12px; color: var(--t2); line-height: 1.55; font-style: italic; border-left: 2px solid var(--v); padding-left: 10px; margin-bottom: 10px; }
-.tbtn-p { font-size: 11px; font-weight: 500; padding: 4px 10px; border-radius: 5px; background: var(--v); color: #fff; cursor: pointer; border: none; font-family: var(--sans); margin-right: 6px; }
-.tbtn-g { font-size: 11px; padding: 4px 10px; border-radius: 5px; background: var(--s3); color: var(--t2); cursor: pointer; border: 1px solid var(--b1); font-family: var(--sans); }
+.tbtn-p { font-size: 11px; font-weight: 500; padding: 4px 10px; border-radius: 5px; background: var(--v); color: #fff; cursor: pointer; border: none; font-family: var(--sans); margin-right: 6px; transition: all 150ms; }
+.tbtn-p:hover { background: var(--vh); transform: translateY(-1px); }
+.tbtn-g { font-size: 11px; padding: 4px 10px; border-radius: 5px; background: var(--s3); color: var(--t2); cursor: pointer; border: 1px solid var(--b1); font-family: var(--sans); transition: all 150ms; }
+.tbtn-g:hover { background: var(--s4); color: var(--t1); }
 
-.crm-row { display: flex; align-items: center; gap: 10px; background: var(--s2); border: 1px solid var(--b1); border-radius: 10px; padding: 11px 14px; }
+.crm-row { display: flex; align-items: center; gap: 10px; background: var(--s2); border: 1px solid var(--b1); border-radius: 10px; padding: 11px 14px; transition: border-color 150ms, transform 150ms; }
+.crm-row:hover { border-color: var(--b3); transform: translateX(3px); }
 .crm-av { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; flex-shrink: 0; }
 .crm-name { font-size: 13px; font-weight: 500; color: var(--t1); }
 .crm-note { font-size: 11px; color: var(--t3); margin-top: 1px; }
 .crm-badge { margin-left: auto; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 4px; flex-shrink: 0; }
 
-.audio-ep { background: var(--s2); border: 1px solid var(--b1); border-radius: 10px; padding: 14px; }
+.audio-ep { background: var(--s2); border: 1px solid var(--b1); border-radius: 10px; padding: 14px; transition: border-color 150ms; }
+.audio-ep:hover { border-color: var(--b3); }
 .audio-pod { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 5px; }
 .audio-title { font-size: 13px; font-weight: 500; color: var(--t1); line-height: 1.4; margin-bottom: 5px; }
 .audio-meta  { font-size: 11.5px; color: var(--t3); margin-bottom: 10px; }
 .audio-insight { font-size: 12px; color: var(--t2); background: var(--s3); border-left: 2px solid var(--coral); padding: 8px 11px; border-radius: 0 6px 6px 0; line-height: 1.55; margin-bottom: 10px; font-style: italic; }
 
-/* FLYWHEEL */
+/* ── FLYWHEEL ── */
 .fw-sec { background: var(--s1); border-top: 1px solid var(--b1); border-bottom: 1px solid var(--b1); }
 .fw-grid { display: grid; grid-template-columns: repeat(3,1fr); border: 1px solid var(--b1); border-radius: 14px; overflow: hidden; margin-top: 48px; }
-.fw-cell { padding: 28px 24px; border-right: 1px solid var(--b1); border-bottom: 1px solid var(--b1); }
+.fw-cell {
+  padding: 28px 24px; border-right: 1px solid var(--b1); border-bottom: 1px solid var(--b1);
+  transition: background 200ms;
+  position: relative; overflow: hidden;
+}
+.fw-cell::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(circle at 0% 100%, var(--vd) 0%, transparent 60%);
+  opacity: 0; transition: opacity 300ms;
+}
+.fw-cell:hover::before { opacity: 1; }
 .fw-cell:nth-child(3n) { border-right: none; }
 .fw-cell:nth-child(n+4) { border-bottom: none; }
 .fw-from  { font-size: 10.5px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--v); margin-bottom: 10px; }
 .fw-title { font-size: 14px; font-weight: 500; color: var(--t1); margin-bottom: 7px; line-height: 1.35; }
 .fw-desc  { font-size: 12.5px; color: var(--t3); line-height: 1.65; }
 
-/* QUOTES */
-.q-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1px; background: var(--b1); border: 1px solid var(--b1); border-radius: 14px; overflow: hidden; margin-top: 48px; }
-.q-cell { background: var(--s1); padding: 28px 26px; }
+/* ── QUOTES ── */
+.q-grid {
+  display: grid; grid-template-columns: repeat(3,1fr);
+  gap: 1px; background: var(--b1);
+  border: 1px solid var(--b1); border-radius: 14px; overflow: hidden;
+  margin-top: 48px;
+}
+.q-cell {
+  background: var(--s1); padding: 28px 26px;
+  transition: background 200ms;
+}
+.q-cell:hover { background: var(--s2); }
 .q-text { font-family: var(--serif); font-size: 1.05rem; color: var(--t1); line-height: 1.65; letter-spacing: -.01em; margin-bottom: 22px; }
 .q-text em { font-style: italic; color: var(--v); }
 .q-author { display: flex; align-items: center; gap: 11px; }
@@ -235,12 +383,20 @@ nav {
 .q-name { font-size: 13px; font-weight: 500; color: var(--t1); }
 .q-role { font-size: 12px; color: var(--t3); margin-top: 1px; }
 
-/* PRICING */
+/* ── PRICING ── */
 .pr-sec { background: var(--s1); border-top: 1px solid var(--b1); }
 .pr-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-top: 48px; }
-.plan { background: var(--s2); border: 1px solid var(--b1); border-radius: 14px; padding: 28px; transition: border-color 200ms; }
-.plan:hover { border-color: var(--b3); }
-.plan.feat { border-color: var(--v); background: linear-gradient(135deg, var(--s2), rgba(124,106,247,0.05)); }
+.plan {
+  background: var(--s2); border: 1px solid var(--b1);
+  border-radius: 14px; padding: 28px;
+  transition: border-color 200ms, transform 250ms, box-shadow 250ms;
+}
+.plan:hover { border-color: var(--b3); transform: translateY(-6px); box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
+.plan.feat {
+  border-color: var(--v);
+  background: linear-gradient(135deg, var(--s2), rgba(124,106,247,0.05));
+}
+.plan.feat:hover { box-shadow: 0 20px 50px rgba(124,106,247,0.2); }
 .plan-pop { font-size: 10px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--v); background: var(--vd); border: 1px solid var(--vm); padding: 3px 10px; border-radius: 20px; display: inline-block; margin-bottom: 14px; }
 .plan-name  { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--t3); margin-bottom: 8px; }
 .plan-price { font-family: var(--serif); font-size: 2.6rem; color: var(--t1); letter-spacing: -.04em; line-height: 1; }
@@ -249,24 +405,34 @@ nav {
 .plan-div  { height: 1px; background: var(--b1); margin-bottom: 18px; }
 .plan-feat { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--t2); padding: 5px 0; }
 .plan-feat::before { content: '✓'; color: var(--v); font-weight: 600; font-size: 12px; }
-.plan-btn { width: 100%; margin-top: 22px; height: 40px; border-radius: 8px; font-size: 13.5px; font-weight: 500; font-family: var(--sans); cursor: pointer; border: none; transition: all 120ms; }
+.plan-btn { width: 100%; margin-top: 22px; height: 40px; border-radius: 8px; font-size: 13.5px; font-weight: 500; font-family: var(--sans); cursor: pointer; border: none; transition: all 150ms; }
 .plan-btn-p { background: var(--v); color: #fff; }
-.plan-btn-p:hover { background: var(--vh); }
+.plan-btn-p:hover { background: var(--vh); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(124,106,247,0.35); }
 .plan-btn-s { background: transparent; color: var(--t2); border: 1px solid var(--b2); }
-.plan-btn-s:hover { background: var(--s3); color: var(--t1); }
+.plan-btn-s:hover { background: var(--s3); color: var(--t1); transform: translateY(-1px); }
 
-/* CTA */
-.cta-sec { background: var(--bg); padding: 120px 40px; text-align: center; border-top: 1px solid var(--b1); }
+/* ── CTA ── */
+.cta-sec {
+  background: var(--bg); padding: 120px 40px; text-align: center;
+  border-top: 1px solid var(--b1); position: relative; overflow: hidden;
+}
+.cta-sec::before {
+  content: ''; position: absolute;
+  width: 800px; height: 800px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(124,106,247,0.06) 0%, transparent 70%);
+  top: 50%; left: 50%; transform: translate(-50%, -50%);
+  pointer-events: none;
+}
 .cta-h2  { font-family: var(--serif); font-size: clamp(2.4rem,5vw,4rem); font-weight: 400; letter-spacing: -.04em; line-height: 1.1; color: var(--t1); margin-bottom: 16px; }
 .cta-sub { font-size: 1rem; color: var(--t2); line-height: 1.75; max-width: 420px; margin: 0 auto 40px; font-weight: 300; }
 .cta-form { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 14px; }
-.cta-inp  { height: 46px; padding: 0 18px; width: 300px; background: var(--s2); border: 1px solid var(--b2); border-radius: 10px; color: var(--t1); font-size: 14px; font-family: var(--sans); outline: none; transition: border 120ms, box-shadow 120ms; }
+.cta-inp  { height: 46px; padding: 0 18px; width: 300px; background: var(--s2); border: 1px solid var(--b2); border-radius: 10px; color: var(--t1); font-size: 14px; font-family: var(--sans); outline: none; transition: border 150ms, box-shadow 150ms; }
 .cta-inp::placeholder { color: var(--t3); }
 .cta-inp:focus { border-color: var(--v); box-shadow: 0 0 0 3px var(--vd); }
 .cta-note { font-size: 12px; color: var(--t3); }
 
-/* FOOTER */
-footer { background: #080711; border-top: 1px solid var(--b0); padding: 48px 40px 36px; }
+/* ── FOOTER ── */
+footer { background: #07060F; border-top: 1px solid var(--b0); padding: 48px 40px 36px; position: relative; z-index: 1; }
 .ft-inner { max-width: 1040px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; }
 .ft-brand p { font-size: 12.5px; color: var(--t3); line-height: 1.7; max-width: 240px; margin-top: 12px; }
 .ft-col-title { font-size: 10.5px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--t3); margin-bottom: 14px; }
@@ -276,11 +442,15 @@ footer { background: #080711; border-top: 1px solid var(--b0); padding: 48px 40p
 .ft-bottom { max-width: 1040px; margin: 32px auto 0; padding-top: 24px; border-top: 1px solid var(--b0); display: flex; align-items: center; justify-content: space-between; }
 .ft-bottom span { font-size: 12px; color: var(--t4); }
 
-/* REVEAL */
-.reveal { opacity: 0; transform: translateY(20px); transition: opacity 600ms ease, transform 600ms ease; }
-.reveal.visible { opacity: 1; transform: translateY(0); }
+/* ── SCROLL PROGRESS ── */
+#scroll-progress {
+  position: fixed; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--v), var(--teal));
+  transform-origin: left; transform: scaleX(0);
+  z-index: 200; transition: transform 50ms;
+}
 
-/* RESPONSIVE */
+/* ── RESPONSIVE ── */
 @media (max-width: 900px) {
   nav { padding: 0 20px; }
   .nav-links { display: none; }
@@ -293,7 +463,7 @@ footer { background: #080711; border-top: 1px solid var(--b0); padding: 48px 40p
   .pillar-row { grid-template-columns: 1fr !important; gap: 32px; }
   .fw-grid { grid-template-columns: 1fr 1fr; }
   .fw-cell:nth-child(2n) { border-right: none; }
-  .fw-cell:nth-child(3) { border-right: 1px solid var(--b1); border-bottom: 1px solid var(--b1) !important; }
+  .fw-cell:nth-child(3) { border-right: 1px solid var(--b1) !important; border-bottom: 1px solid var(--b1) !important; }
   .fw-cell:nth-child(4) { border-bottom: 1px solid var(--b1) !important; }
   .q-grid, .pr-grid { grid-template-columns: 1fr; }
   .ft-inner { grid-template-columns: 1fr 1fr; }
@@ -303,6 +473,13 @@ footer { background: #080711; border-top: 1px solid var(--b0); padding: 48px 40p
 </head>
 <body>
 
+<!-- Scroll progress bar -->
+<div id="scroll-progress"></div>
+
+<!-- Particle canvas -->
+<canvas id="bg-canvas"></canvas>
+
+<!-- NAV -->
 <nav id="nav">
   <div class="nav-brand">
     <div class="nav-mark">
@@ -318,7 +495,7 @@ footer { background: #080711; border-top: 1px solid var(--b0); padding: 48px 40p
     <a href="#pricing">Pricing</a>
     <a href="#about">About</a>
   </div>
-  <div class="nav-cta">
+  <div style="display:flex;gap:10px;align-items:center">
     <button class="btn btn-ghost" onclick="scrollToWL()">Sign in</button>
     <button class="btn btn-violet" onclick="scrollToWL()">Join waitlist</button>
   </div>
@@ -328,7 +505,11 @@ footer { background: #080711; border-top: 1px solid var(--b0); padding: 48px 40p
 <section class="hero" id="top">
   <div class="hero-inner">
     <div class="hero-badge"><span class="badge-dot"></span>Now in private beta</div>
-    <h1 class="hero-h1">What you learn<br>becomes what<br>you <em>say.</em></h1>
+
+    <h1 class="hero-h1" id="hero-h1">
+      What you learn<br>becomes what<br>you <em id="typed-word">say.</em><span class="cursor-blink" id="hero-cursor"></span>
+    </h1>
+
     <p class="hero-sub">Sable connects your audio intelligence, your social presence, and your client relationships — so everything you hear becomes something you can use.</p>
 
     <div class="wl-form" id="hero-form">
@@ -337,8 +518,8 @@ footer { background: #080711; border-top: 1px solid var(--b0); padding: 48px 40p
     </div>
     <div class="success-box" id="hero-success">
       <div class="success-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4ADE80" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg></div>
-      <p style="font-size:15px;font-weight:500;color:var(--t1);">You're on the list</p>
-      <p style="font-size:13px;color:var(--t3);">We'll reach out when your spot is ready.</p>
+      <p style="font-size:15px;font-weight:500;color:var(--t1)">You're on the list</p>
+      <p style="font-size:13px;color:var(--t3)">We'll reach out when your spot is ready.</p>
     </div>
 
     <div class="trust">
@@ -348,49 +529,52 @@ footer { background: #080711; border-top: 1px solid var(--b0); padding: 48px 40p
     </div>
   </div>
 
-  <div class="hero-preview reveal">
-    <div class="preview-win">
-      <div class="preview-bar">
-        <div class="pw-dot" style="background:#FF5F57"></div>
-        <div class="pw-dot" style="background:#FEBC2E"></div>
-        <div class="pw-dot" style="background:#28C840"></div>
-        <div class="preview-url">app.sable.io/dashboard</div>
-      </div>
-      <div class="preview-body">
-        <div class="preview-sb">
-          <div style="display:flex;align-items:center;gap:8px;padding:0 8px;margin-bottom:20px;">
-            <div style="width:22px;height:22px;background:var(--bg);border:1px solid var(--b2);border-radius:6px;display:flex;align-items:center;justify-content:center;">
-              <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M4 12 L8 3 L12 12" stroke="#EDEAFF" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/><line x1="5.4" y1="9" x2="10.6" y2="9" stroke="#7C6AF7" stroke-width="1.4" stroke-linecap="round"/></svg>
-            </div>
-            <span style="font-family:var(--serif);font-size:13px;color:var(--t1);">sable</span>
-          </div>
-          <div style="margin-bottom:16px;">
-            <span class="pnav-label">Overview</span>
-            <div class="pnav-item on">Dashboard</div>
-            <div class="pnav-item" style="color:var(--t3)">Calendar</div>
-          </div>
-          <div>
-            <span class="pnav-label">Pillars</span>
-            <div class="pnav-item" style="color:var(--t3)">Social <span class="pnav-badge nb-v">3</span></div>
-            <div class="pnav-item" style="color:var(--t3)">CRM <span class="pnav-badge nb-c">!</span></div>
-            <div class="pnav-item" style="color:var(--t3)">Audio <span class="pnav-badge nb-t">7</span></div>
-          </div>
+  <!-- Preview window -->
+  <div class="hero-preview" data-parallax="0.15">
+    <div class="preview-float">
+      <div class="preview-win">
+        <div class="preview-bar">
+          <div class="pw-dot" style="background:#FF5F57"></div>
+          <div class="pw-dot" style="background:#FEBC2E"></div>
+          <div class="pw-dot" style="background:#28C840"></div>
+          <div class="preview-url">app.sable.io/dashboard</div>
         </div>
-        <div class="preview-main">
-          <div class="p-greeting">Good morning</div>
-          <div class="p-date">Tuesday, 24 October</div>
-          <div class="p-stats">
-            <div class="p-stat"><div class="p-stat-v">12</div><div class="p-stat-l">Posts this week</div><div class="p-stat-d">↑ +4</div></div>
-            <div class="p-stat"><div class="p-stat-v">84k</div><div class="p-stat-l">Impressions</div><div class="p-stat-d">↑ +18%</div></div>
-            <div class="p-stat"><div class="p-stat-v">4</div><div class="p-stat-l">Needs attention</div><div class="p-stat-d" style="color:var(--coral)">Urgent</div></div>
+        <div class="preview-body">
+          <div class="preview-sb">
+            <div style="display:flex;align-items:center;gap:8px;padding:0 8px;margin-bottom:20px">
+              <div style="width:22px;height:22px;background:var(--bg);border:1px solid var(--b2);border-radius:6px;display:flex;align-items:center;justify-content:center">
+                <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M4 12 L8 3 L12 12" stroke="#EDEAFF" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/><line x1="5.4" y1="9" x2="10.6" y2="9" stroke="#7C6AF7" stroke-width="1.4" stroke-linecap="round"/></svg>
+              </div>
+              <span style="font-family:var(--serif);font-size:13px;color:var(--t1)">sable</span>
+            </div>
+            <div style="margin-bottom:16px">
+              <span class="pnav-label">Overview</span>
+              <div class="pnav-item on">Dashboard</div>
+              <div class="pnav-item" style="color:var(--t3)">Calendar</div>
+            </div>
+            <div>
+              <span class="pnav-label">Pillars</span>
+              <div class="pnav-item" style="color:var(--t3)">Social <span class="pnav-badge nb-v">3</span></div>
+              <div class="pnav-item" style="color:var(--t3)">CRM <span class="pnav-badge nb-c">!</span></div>
+              <div class="pnav-item" style="color:var(--t3)">Audio <span class="pnav-badge nb-t">7</span></div>
+            </div>
           </div>
-          <div class="p-panel">
-            <div class="p-panel-h"><span>Upcoming posts</span><span style="font-size:10.5px;color:var(--t3)">View calendar</span></div>
-            <div class="p-post-row"><div class="p-post-dot" style="background:var(--v)"></div><span class="p-post-text">Three things about shipping your first 1,000 users...</span><span class="p-post-tag pt-s">Scheduled</span></div>
-            <div class="p-post-row"><div class="p-post-dot" style="background:var(--t4)"></div><span class="p-post-text">The shift from audience to community building...</span><span class="p-post-tag pt-d">Draft</span></div>
-            <div class="p-ai-row">
-              <div class="ai-gem"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="var(--v)" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
-              <span><strong style="color:var(--v);font-weight:500">Trend alert:</strong> Community-building is up 142% in your niche this week.</span>
+          <div class="preview-main">
+            <div class="p-greeting">Good morning</div>
+            <div class="p-date">Tuesday, 24 October</div>
+            <div class="p-stats">
+              <div class="p-stat"><div class="p-stat-v">12</div><div class="p-stat-l">Posts this week</div><div class="p-stat-d">↑ +4</div></div>
+              <div class="p-stat"><div class="p-stat-v">84k</div><div class="p-stat-l">Impressions</div><div class="p-stat-d">↑ +18%</div></div>
+              <div class="p-stat"><div class="p-stat-v">4</div><div class="p-stat-l">Need attention</div><div class="p-stat-d" style="color:var(--coral)">Urgent</div></div>
+            </div>
+            <div class="p-panel">
+              <div class="p-panel-h"><span>Upcoming posts</span><span style="font-size:10.5px;color:var(--t3)">View calendar</span></div>
+              <div class="p-post-row"><div class="p-post-dot" style="background:var(--v)"></div><span class="p-post-text">Three things about shipping your first 1,000 users...</span><span class="p-post-tag pt-s">Scheduled</span></div>
+              <div class="p-post-row"><div class="p-post-dot" style="background:var(--t4)"></div><span class="p-post-text">The shift from audience to community building...</span><span class="p-post-tag pt-d">Draft</span></div>
+              <div class="p-ai-row">
+                <div class="ai-gem"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="var(--v)" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+                <span><strong style="color:var(--v);font-weight:500">Trend alert:</strong> Community-building is up 142% in your niche this week.</span>
+              </div>
             </div>
           </div>
         </div>
@@ -403,17 +587,17 @@ footer { background: #080711; border-top: 1px solid var(--b0); padding: 48px 40p
 <section class="prob-sec sec" id="product">
   <div class="sec-inner">
     <div class="prob-grid">
-      <div class="prob-a reveal">
+      <div class="prob-a reveal-left">
         <span class="sec-label" style="color:var(--t3)">The problem</span>
         <h2 class="sec-h2">You're drowning<br>in disconnected<br>tools.</h2>
         <p style="font-size:.95rem;color:var(--t2);line-height:1.8;margin-top:20px;font-weight:300">A scheduler here. A CRM there. Podcasts in one app, follow-ups in another. None of them talk to each other — so the insight from your 7am podcast never makes it into your LinkedIn post, and the person who commented on your post never makes it into your pipeline.</p>
       </div>
       <div class="prob-b">
-        <div class="prob-list">
-          <div class="prob-item reveal"><div class="prob-num">01</div><div class="prob-text"><h4>Posting without signal</h4><p>Generic content anyone could have written. No niche intelligence driving what you say or when.</p></div></div>
-          <div class="prob-item reveal"><div class="prob-num">02</div><div class="prob-text"><h4>Contacts going cold</h4><p>You meant to follow up. The relationship score drops every week you wait and you don't even know it.</p></div></div>
-          <div class="prob-item reveal"><div class="prob-num">03</div><div class="prob-text"><h4>Learning but not using it</h4><p>You consume podcasts, articles, conversations. Almost none of it makes it into your content or client conversations.</p></div></div>
-          <div class="prob-item reveal"><div class="prob-num">04</div><div class="prob-text"><h4>Three subscriptions, zero synthesis</h4><p>Buffer, HubSpot free, Pocket Casts. $60/mo and four hours a week to stay fragmented.</p></div></div>
+        <div class="prob-list stagger">
+          <div class="prob-item"><div class="prob-num">01</div><div class="prob-text"><h4>Posting without signal</h4><p>Generic content anyone could have written. No niche intelligence driving what you say or when.</p></div></div>
+          <div class="prob-item"><div class="prob-num">02</div><div class="prob-text"><h4>Contacts going cold</h4><p>You meant to follow up. The relationship score drops every week you wait and you don't even know it.</p></div></div>
+          <div class="prob-item"><div class="prob-num">03</div><div class="prob-text"><h4>Learning but not using it</h4><p>You consume podcasts, articles, conversations. Almost none of it makes it into your content or client conversations.</p></div></div>
+          <div class="prob-item"><div class="prob-num">04</div><div class="prob-text"><h4>Three subscriptions, zero synthesis</h4><p>Buffer, HubSpot free, Pocket Casts. $60/mo and four hours a week to stay fragmented.</p></div></div>
         </div>
       </div>
     </div>
@@ -429,7 +613,7 @@ footer { background: #080711; border-top: 1px solid var(--b0); padding: 48px 40p
     </div>
 
     <div class="pillar-row pl-la">
-      <div class="reveal">
+      <div class="reveal-left">
         <div class="p-num">01</div>
         <div class="p-label lv">Social curator</div>
         <h3 class="p-title">Post with purpose,<br>not just frequency.</h3>
@@ -441,7 +625,7 @@ footer { background: #080711; border-top: 1px solid var(--b0); padding: 48px 40p
           <div class="p-feat"><strong>Optimal timing</strong> — your audience, not averages</div>
         </div>
       </div>
-      <div class="p-panel reveal">
+      <div class="p-panel reveal-right">
         <div class="pp-head"><span>Trending in your niche</span><span class="pp-sub">Updated 2h ago</span></div>
         <div class="pp-body">
           <div class="trend-card">
@@ -461,7 +645,7 @@ footer { background: #080711; border-top: 1px solid var(--b0); padding: 48px 40p
     </div>
 
     <div class="pillar-row pl-lb">
-      <div class="p-panel reveal">
+      <div class="p-panel reveal-left">
         <div class="pp-head"><span>Needs attention</span><span class="pp-sub">4 contacts</span></div>
         <div class="pp-body">
           <div class="crm-row">
@@ -474,14 +658,14 @@ footer { background: #080711; border-top: 1px solid var(--b0); padding: 48px 40p
             <div><div class="crm-name">James Kim</div><div class="crm-note">Commented on your post today</div></div>
             <div class="crm-badge" style="background:rgba(45,212,191,.10);color:var(--teal)">New signal</div>
           </div>
-          <div style="padding:12px 14px;background:var(--s2);border:1px solid var(--b1);border-radius:10px;border-left:2px solid var(--v)">
+          <div style="padding:12px 14px;background:var(--s2);border:1px solid var(--b1);border-radius:10px;border-left:2px solid var(--v);transition:border-color 150ms">
             <p style="font-size:10px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--v);margin-bottom:7px">AI suggestion</p>
             <p style="font-size:12px;color:var(--t2);line-height:1.6;margin-bottom:10px">"Hey Sarah — I listened to a great podcast about pricing strategy that reminded me of your question..."</p>
             <button class="tbtn-p">Send this follow-up</button>
           </div>
         </div>
       </div>
-      <div class="reveal">
+      <div class="reveal-right">
         <div class="p-num">02</div>
         <div class="p-label lt">Smart CRM</div>
         <h3 class="p-title">Your clients don't<br>care that<br>you're busy.</h3>
@@ -496,7 +680,7 @@ footer { background: #080711; border-top: 1px solid var(--b0); padding: 48px 40p
     </div>
 
     <div class="pillar-row pl-la">
-      <div class="reveal">
+      <div class="reveal-left">
         <div class="p-num">03</div>
         <div class="p-label lc">Audio curator</div>
         <h3 class="p-title">Stop consuming.<br>Start using<br>what you hear.</h3>
@@ -508,7 +692,7 @@ footer { background: #080711; border-top: 1px solid var(--b0); padding: 48px 40p
           <div class="p-feat"><strong>Tag to contacts</strong> — conversation starters</div>
         </div>
       </div>
-      <div class="p-panel reveal">
+      <div class="p-panel reveal-right">
         <div class="pp-head"><span>Today's brief</span><span class="pp-sub">4 episodes · 3h 12m</span></div>
         <div class="pp-body">
           <div class="audio-ep">
@@ -533,13 +717,13 @@ footer { background: #080711; border-top: 1px solid var(--b0); padding: 48px 40p
       <h2 class="sec-h2">Each pillar makes<br>the others smarter.</h2>
       <p class="sec-sub" style="margin-top:14px">This is what separates Sable from three separate tools. The data flows between pillars — what you hear shapes what you say, what you say brings you closer to the right people.</p>
     </div>
-    <div class="fw-grid">
-      <div class="fw-cell reveal"><div class="fw-from">Audio → Social</div><div class="fw-title">Insights become posts</div><div class="fw-desc">One click turns a podcast insight into a caption in your exact voice.</div></div>
-      <div class="fw-cell reveal"><div class="fw-from">Social → CRM</div><div class="fw-title">Engagement becomes contacts</div><div class="fw-desc">Post commenters who signal interest are automatically suggested as CRM contacts.</div></div>
-      <div class="fw-cell reveal"><div class="fw-from">CRM → Social</div><div class="fw-title">Relationships shape content</div><div class="fw-desc">Your clients' interests feed into what topics Sable recommends you post about.</div></div>
-      <div class="fw-cell reveal"><div class="fw-from">Social → Audio</div><div class="fw-title">Posts guide listening</div><div class="fw-desc">Top-performing topics surface related episodes in your daily brief.</div></div>
-      <div class="fw-cell reveal"><div class="fw-from">Audio → CRM</div><div class="fw-title">Insights tag contacts</div><div class="fw-desc">Bookmark a podcast moment to a contact's record as a conversation starter.</div></div>
-      <div class="fw-cell reveal"><div class="fw-from">CRM → Schedule</div><div class="fw-title">Timing gets personal</div><div class="fw-desc">Your audience's engagement patterns inform exactly when your posts go live.</div></div>
+    <div class="fw-grid stagger">
+      <div class="fw-cell"><div class="fw-from">Audio → Social</div><div class="fw-title">Insights become posts</div><div class="fw-desc">One click turns a podcast insight into a caption in your exact voice.</div></div>
+      <div class="fw-cell"><div class="fw-from">Social → CRM</div><div class="fw-title">Engagement becomes contacts</div><div class="fw-desc">Post commenters who signal interest are automatically suggested as CRM contacts.</div></div>
+      <div class="fw-cell"><div class="fw-from">CRM → Social</div><div class="fw-title">Relationships shape content</div><div class="fw-desc">Your clients' interests feed into what topics Sable recommends you post about.</div></div>
+      <div class="fw-cell"><div class="fw-from">Social → Audio</div><div class="fw-title">Posts guide listening</div><div class="fw-desc">Top-performing topics surface related episodes in your daily brief.</div></div>
+      <div class="fw-cell"><div class="fw-from">Audio → CRM</div><div class="fw-title">Insights tag contacts</div><div class="fw-desc">Bookmark a podcast moment to a contact's record as a conversation starter.</div></div>
+      <div class="fw-cell"><div class="fw-from">CRM → Schedule</div><div class="fw-title">Timing gets personal</div><div class="fw-desc">Your audience's engagement patterns inform exactly when your posts go live.</div></div>
     </div>
   </div>
 </section>
@@ -551,10 +735,10 @@ footer { background: #080711; border-top: 1px solid var(--b0); padding: 48px 40p
       <span class="sec-label">Early access feedback</span>
       <h2 class="sec-h2">Built for people who<br>think seriously about<br>their presence.</h2>
     </div>
-    <div class="q-grid">
-      <div class="q-cell reveal"><div class="q-text">"The moment I saw a podcast insight turn into a LinkedIn post in my voice — I understood what this was. It's not a scheduler. It's a <em>thinking partner.</em>"</div><div class="q-author"><div class="q-av">AK</div><div><div class="q-name">Amara Kone</div><div class="q-role">B2B consultant, Lagos</div></div></div></div>
-      <div class="q-cell reveal"><div class="q-text">"I've tried six CRMs. This is the first one that <em>tells me</em> who to reach out to. I don't have to remember anything — it remembers for me."</div><div class="q-author"><div class="q-av">JL</div><div><div class="q-name">Jake Liu</div><div class="q-role">Freelance designer, San Francisco</div></div></div></div>
-      <div class="q-cell reveal"><div class="q-text">"It generated a post that sounded so much like me, I had to check I didn't write it. <em>It had read my posts.</em>"</div><div class="q-author"><div class="q-av">NB</div><div><div class="q-name">Nina Barlow</div><div class="q-role">Executive coach, London</div></div></div></div>
+    <div class="q-grid stagger">
+      <div class="q-cell"><div class="q-text">"The moment I saw a podcast insight turn into a LinkedIn post in my voice — I understood what this was. It's not a scheduler. It's a <em>thinking partner.</em>"</div><div class="q-author"><div class="q-av">AK</div><div><div class="q-name">Amara Kone</div><div class="q-role">B2B consultant, Lagos</div></div></div></div>
+      <div class="q-cell"><div class="q-text">"I've tried six CRMs. This is the first one that <em>tells me</em> who to reach out to. I don't have to remember anything — it remembers for me."</div><div class="q-author"><div class="q-av">JL</div><div><div class="q-name">Jake Liu</div><div class="q-role">Freelance designer, San Francisco</div></div></div></div>
+      <div class="q-cell"><div class="q-text">"It generated a post that sounded so much like me, I had to check I didn't write it. <em>It had read my posts.</em>"</div><div class="q-author"><div class="q-av">NB</div><div><div class="q-name">Nina Barlow</div><div class="q-role">Executive coach, London</div></div></div></div>
     </div>
   </div>
 </section>
@@ -567,8 +751,8 @@ footer { background: #080711; border-top: 1px solid var(--b0); padding: 48px 40p
       <h2 class="sec-h2">Honest. Simple.<br>Earns its keep.</h2>
       <p class="sec-sub" style="margin-top:14px">Start free. Upgrade when Sable is clearly saving you more time than it costs.</p>
     </div>
-    <div class="pr-grid">
-      <div class="plan reveal">
+    <div class="pr-grid stagger">
+      <div class="plan">
         <div class="plan-name">Free</div>
         <div class="plan-price">$0<span>/mo</span></div>
         <p class="plan-desc">For getting a feel for the platform.</p>
@@ -580,7 +764,7 @@ footer { background: #080711; border-top: 1px solid var(--b0); padding: 48px 40p
         <div class="plan-feat">5 audio summaries / mo</div>
         <button class="plan-btn plan-btn-s" onclick="scrollToWL()">Join waitlist</button>
       </div>
-      <div class="plan feat reveal">
+      <div class="plan feat">
         <div class="plan-pop">Most popular</div>
         <div class="plan-name">Growth</div>
         <div class="plan-price">$39<span>/mo</span></div>
@@ -594,7 +778,7 @@ footer { background: #080711; border-top: 1px solid var(--b0); padding: 48px 40p
         <div class="plan-feat">Analytics dashboard</div>
         <button class="plan-btn plan-btn-p" onclick="scrollToWL()">Join waitlist</button>
       </div>
-      <div class="plan reveal">
+      <div class="plan">
         <div class="plan-name">Business</div>
         <div class="plan-price">$89<span>/mo</span></div>
         <p class="plan-desc">For small teams and growing businesses.</p>
@@ -612,8 +796,8 @@ footer { background: #080711; border-top: 1px solid var(--b0); padding: 48px 40p
 
 <!-- CTA -->
 <section class="cta-sec" id="waitlist">
-  <div style="max-width:500px;margin:0 auto">
-    <span class="sec-label" style="display:block;text-align:center;color:rgba(124,106,247,.6);margin-bottom:14px">Early access</span>
+  <div style="max-width:500px;margin:0 auto;position:relative;z-index:1" class="reveal">
+    <span class="sec-label" style="display:block;text-align:center;color:rgba(124,106,247,.5);margin-bottom:14px">Early access</span>
     <h2 class="cta-h2">Ready when<br>you are.</h2>
     <p class="cta-sub">Join the waitlist. We're opening access to a small group each week — people ready to stop juggling and start compounding.</p>
     <div id="cta-wrap">
@@ -636,7 +820,7 @@ footer { background: #080711; border-top: 1px solid var(--b0); padding: 48px 40p
   <div class="ft-inner">
     <div class="ft-brand">
       <div style="display:flex;align-items:center;gap:10px">
-        <div class="nav-mark" style="width:26px;height:26px">
+        <div style="width:26px;height:26px;background:var(--s2);border:1px solid var(--b2);border-radius:7px;display:flex;align-items:center;justify-content:center">
           <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M4 12 L8 3 L12 12" stroke="#9895B4" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/><line x1="5.4" y1="9" x2="10.6" y2="9" stroke="#7C6AF7" stroke-width="1.4" stroke-linecap="round"/></svg>
         </div>
         <span style="font-family:var(--serif);font-size:15px;color:var(--t2);letter-spacing:-.025em">sable</span>
@@ -671,36 +855,192 @@ footer { background: #080711; border-top: 1px solid var(--b0); padding: 48px 40p
     </div>
   </div>
   <div class="ft-bottom">
-    <span>© 2025 Sable Technologies, Inc.</span>
+    <span>© 2026 Sable Technologies, Inc.</span>
     <span>Designed with intention.</span>
   </div>
 </footer>
 
 <script>
-const obs = new IntersectionObserver(entries => {
-  entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add('visible'); obs.unobserve(e.target); } })
-}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' })
-document.querySelectorAll('.reveal').forEach(el => obs.observe(el))
+/* ══════════════════════════════════════
+   PARTICLE CANVAS
+══════════════════════════════════════ */
+const canvas = document.getElementById('bg-canvas')
+const ctx = canvas.getContext('2d')
 
-window.addEventListener('scroll', () => {
-  document.getElementById('nav').style.borderBottomColor = window.scrollY > 20 ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.08)'
+let W, H, particles = [], mouse = { x: 0, y: 0 }
+
+function resize() {
+  W = canvas.width  = window.innerWidth
+  H = canvas.height = window.innerHeight
+}
+resize()
+window.addEventListener('resize', resize)
+
+window.addEventListener('mousemove', e => {
+  mouse.x = e.clientX
+  mouse.y = e.clientY
 })
 
+class Particle {
+  constructor() { this.reset() }
+  reset() {
+    this.x  = Math.random() * W
+    this.y  = Math.random() * H
+    this.vx = (Math.random() - 0.5) * 0.3
+    this.vy = (Math.random() - 0.5) * 0.3
+    this.r  = Math.random() * 1.2 + 0.3
+    this.a  = Math.random() * 0.4 + 0.05
+    this.life = Math.random()
+  }
+  update() {
+    // Mouse repulsion
+    const dx = this.x - mouse.x
+    const dy = this.y - mouse.y
+    const dist = Math.sqrt(dx*dx + dy*dy)
+    if (dist < 120) {
+      const force = (120 - dist) / 120 * 0.5
+      this.vx += dx / dist * force
+      this.vy += dy / dist * force
+    }
+    this.x += this.vx
+    this.y += this.vy
+    // Damping
+    this.vx *= 0.99
+    this.vy *= 0.99
+    // Wrap
+    if (this.x < 0) this.x = W
+    if (this.x > W) this.x = 0
+    if (this.y < 0) this.y = H
+    if (this.y > H) this.y = 0
+  }
+  draw() {
+    ctx.beginPath()
+    ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2)
+    ctx.fillStyle = `rgba(124, 106, 247, ${this.a})`
+    ctx.fill()
+  }
+}
+
+// Spawn particles
+for (let i = 0; i < 120; i++) particles.push(new Particle())
+
+// Connection lines
+function drawLines() {
+  for (let i = 0; i < particles.length; i++) {
+    for (let j = i + 1; j < particles.length; j++) {
+      const dx = particles[i].x - particles[j].x
+      const dy = particles[i].y - particles[j].y
+      const d = Math.sqrt(dx*dx + dy*dy)
+      if (d < 100) {
+        ctx.beginPath()
+        ctx.moveTo(particles[i].x, particles[i].y)
+        ctx.lineTo(particles[j].x, particles[j].y)
+        ctx.strokeStyle = `rgba(124, 106, 247, ${(1 - d/100) * 0.08})`
+        ctx.lineWidth = 0.5
+        ctx.stroke()
+      }
+    }
+  }
+}
+
+function animate() {
+  ctx.clearRect(0, 0, W, H)
+  particles.forEach(p => { p.update(); p.draw() })
+  drawLines()
+  requestAnimationFrame(animate)
+}
+animate()
+
+/* ══════════════════════════════════════
+   SCROLL PROGRESS
+══════════════════════════════════════ */
+const progressBar = document.getElementById('scroll-progress')
+window.addEventListener('scroll', () => {
+  const pct = window.scrollY / (document.body.scrollHeight - window.innerHeight)
+  progressBar.style.transform = `scaleX(${pct})`
+
+  // Nav scroll state
+  document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 40)
+}, { passive: true })
+
+/* ══════════════════════════════════════
+   SCROLL REVEAL
+══════════════════════════════════════ */
+const revealObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible')
+      revealObs.unobserve(e.target)
+    }
+  })
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' })
+
+document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale, .stagger').forEach(el => revealObs.observe(el))
+
+/* ══════════════════════════════════════
+   PARALLAX
+══════════════════════════════════════ */
+const parallaxEls = document.querySelectorAll('[data-parallax]')
+
+window.addEventListener('scroll', () => {
+  const scrollY = window.scrollY
+  parallaxEls.forEach(el => {
+    const speed  = parseFloat(el.dataset.parallax)
+    const rect   = el.getBoundingClientRect()
+    const center = rect.top + rect.height / 2 - window.innerHeight / 2
+    el.style.transform = `translateY(${center * speed}px)`
+  })
+}, { passive: true })
+
+/* ══════════════════════════════════════
+   TYPING EFFECT — hero
+══════════════════════════════════════ */
+const words = ['say.', 'create.', 'publish.', 'build with.', 'share.', 'grow with.']
+let wordIdx = 0, charIdx = 0, deleting = false
+const typedEl  = document.getElementById('typed-word')
+const cursorEl = document.getElementById('hero-cursor')
+
+function typeLoop() {
+  const word = words[wordIdx]
+  if (!deleting) {
+    typedEl.textContent = word.slice(0, ++charIdx)
+    if (charIdx === word.length) {
+      deleting = true
+      setTimeout(typeLoop, 2000)
+      return
+    }
+  } else {
+    typedEl.textContent = word.slice(0, --charIdx)
+    if (charIdx === 0) {
+      deleting = false
+      wordIdx  = (wordIdx + 1) % words.length
+    }
+  }
+  setTimeout(typeLoop, deleting ? 60 : 90)
+}
+
+// Start after hero animation settles
+setTimeout(typeLoop, 2000)
+
+/* ══════════════════════════════════════
+   WAITLIST SUBMIT
+══════════════════════════════════════ */
 function submit(src) {
-  const id = src === 'hero' ? 'hero-email' : 'cta-email'
+  const id  = src === 'hero' ? 'hero-email' : 'cta-email'
   const val = document.getElementById(id).value.trim()
   if (!val || !val.includes('@')) {
     const el = document.getElementById(id)
     el.style.borderColor = '#F87171'
-    el.style.boxShadow = '0 0 0 3px rgba(248,113,113,0.15)'
-    setTimeout(() => { el.style.borderColor = ''; el.style.boxShadow = ''; }, 2000)
+    el.style.boxShadow   = '0 0 0 3px rgba(248,113,113,0.15)'
+    el.focus()
+    setTimeout(() => { el.style.borderColor = ''; el.style.boxShadow = ''; }, 2500)
     return
   }
   if (src === 'hero') {
-    document.getElementById('hero-form').style.display = 'none'
+    document.getElementById('hero-form').style.display    = 'none'
     document.getElementById('hero-success').classList.add('show')
   } else {
-    document.getElementById('cta-wrap').style.display = 'none'
+    document.getElementById('cta-wrap').style.display     = 'none'
     document.getElementById('cta-success').classList.add('show')
   }
 }
