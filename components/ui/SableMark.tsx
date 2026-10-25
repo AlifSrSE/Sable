@@ -12,10 +12,11 @@ export function SableMark({ size = 28 }: SableMarkProps) {
       fill="none"
       aria-hidden="true"
     >
-      <rect width="30" height="30" rx={rx} fill="#0C0B14" />
+      {/* Background uses CSS var so it adapts in light mode */}
+      <rect width="30" height="30" rx={rx} fill="var(--t1)" />
       <path
         d="M9 21 L15 7 L21 21"
-        stroke="#EAE6FF"
+        stroke="var(--bg)"
         strokeWidth="1.65"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -24,7 +25,7 @@ export function SableMark({ size = 28 }: SableMarkProps) {
       <line
         x1="11.3" y1="16.5"
         x2="18.7" y2="16.5"
-        stroke="#7C6AF7"
+        stroke="var(--v)"
         strokeWidth="1.65"
         strokeLinecap="round"
       />
