@@ -1,12 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { trpc } from '@/lib/trpc'
 
 function getUrgency(lastContactedAt: Date | null): 'urgent' | 'soon' | 'ok' {
   if (!lastContactedAt) return 'urgent'
   const days = Math.floor((Date.now() - new Date(lastContactedAt).getTime()) / 86400000)
-  if (days > 21) return 'urgent'
+  if (days > 14) return 'urgent'
   if (days > 7)  return 'soon'
   return 'ok'
 }
@@ -46,6 +46,12 @@ function AddModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: () =
     onError: (e) => setErr(e.message),
   })
 
+  useEffect(() => {
+    const h = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
+    document.addEventListener('keydown', h)
+    return () => document.removeEventListener('keydown', h)
+  }, [onClose])
+
   return (
     <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
       <div className="modal-box" style={{ width:'420px' }}>
@@ -76,6 +82,49 @@ function AddModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: () =
     </div>
   )
 }
+
+function EditModal({ contact, onClose, onSuccess }: { contact: { id:string; name:string; email:string|null; company:string|null; role:string|null }; onClose:()=>void; onSuccess:()=>void }) {
+  const [name,    setName]    = useState(contact.name)
+  const [email,   setEmail]   = useState(contact.email ?? '')
+  const [company, setCompany] = useState(contact.company ?? '')
+  const [role,    setRole]    = useState(contact.role ?? '')
+  const [err,     setErr]     = useState('')
+
+  const update = trpc.contacts.update.useMutation({
+    onSuccess: () => { onSuccess(); onClose() },
+    onError: (e) => setErr(e.message),
+  })
+
+  return (
+    <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="modal-box" style={{ width:'420px' }}>
+        <h2 style={{ fontFamily:'var(--serif)', fontSize:'1.4rem', color:'var(--t1)', letterSpacing:'-0.03em', marginBottom:'20px' }}>Edit contact</h2>
+        {err && <div style={{ padding:'10px 12px', background:'var(--err-dim)', border:'1px solid var(--err)', borderRadius:'7px', marginBottom:'14px', fontSize:'13px', color:'var(--err)' }}>{err}</div>}
+        <div style={{ display:'flex', flexDirection:'column', gap:'14px', marginBottom:'24px' }}>
+          {[
+            { label:'Full name *', value:name,    set:setName,    ph:'Sarah Chen' },
+            { label:'Email',       value:email,   set:setEmail,   ph:'sarah@company.com' },
+            { label:'Company',     value:company, set:setCompany, ph:'Acme Corp' },
+            { label:'Role',        value:role,    set:setRole,    ph:'Head of Growth' },
+          ].map(f => (
+            <div key={f.label}>
+              <label style={{ display:'block', fontSize:'12px', fontWeight:500, color:'var(--t2)', marginBottom:'6px' }}>{f.label}</label>
+              <input type="text" value={f.value} onChange={e => f.set(e.target.value)} placeholder={f.ph} className="sable-input" />
+            </div>
+          ))}
+        </div>
+        <div style={{ display:'flex', gap:'8px', justifyContent:'flex-end' }}>
+          <button className="btn-secondary" onClick={onClose}>Cancel</button>
+          <button className="btn-primary" disabled={!name.trim() || update.isPending}
+            onClick={() => update.mutate({ id: contact.id, name, email: email||undefined, company: company||undefined, role: role||undefined })}>
+            {update.isPending ? 'Saving...' : 'Save changes'}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 
 function LogModal({ contactId, contactName, onClose, onSuccess }: { contactId:string; contactName:string; onClose:()=>void; onSuccess:()=>void }) {
   const [type, setType] = useState<'email'|'call'|'meeting'|'note'>('note')
@@ -131,13 +180,15 @@ function LogModal({ contactId, contactName, onClose, onSuccess }: { contactId:st
 export default function CRMPage() {
   const [search,   setSearch]   = useState('')
   const [selected, setSelected] = useState<string|null>(null)
-  const [showAdd,  setShowAdd]  = useState(false)
-  const [showLog,  setShowLog]  = useState(false)
+  const [showAdd,       setShowAdd]       = useState(false)
+  const [showLog,       setShowLog]       = useState(false)
+  const [showEdit,      setShowEdit]      = useState(false)
+  const [confirmDelete, setConfirmDelete] = useState<{id:string; name:string}|null>(null)
 
   const { data: listData, isLoading, refetch } = trpc.contacts.list.useQuery({ search, limit: 50 })
   const { data: stats }     = trpc.contacts.stats.useQuery()
   const { data: attention } = trpc.contacts.needsAttention.useQuery()
-  const { data: contact, refetch: refetchContact } = trpc.contacts.byId.useQuery(
+  const { data: contact, refetch: refetchContact, isFetching: contactFetching } = trpc.contacts.byId.useQuery(
     { id: selected! }, { enabled: !!selected }
   )
 
@@ -258,7 +309,14 @@ export default function CRMPage() {
         </div>
 
         {/* Right */}
-        <div style={{ display:'flex', flexDirection:'column', background:'var(--s1)', overflow:'hidden' }}>
+        <div style={{ display:'flex', flexDirection:'column', background:'var(--s1)', overflow:'hidden', position:'relative' }}>
+          {contactFetching && selected && (
+            <div style={{ position: 'absolute', inset: 0, background: 'var(--bg)', opacity: 0.6, zIndex: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" strokeWidth="1.5" style={{ animation: 'spin 0.8s linear infinite' }}>
+                <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+              </svg>
+            </div>
+          )}
           {contact ? (
             <>
               <div style={{ padding:'20px', borderBottom:'1px solid var(--b0)' }}>
@@ -270,8 +328,16 @@ export default function CRMPage() {
                     <p style={{ fontSize:'14.5px', fontWeight:500, color:'var(--t1)' }}>{contact.name}</p>
                     <p style={{ fontSize:'12px', color:'var(--t3)' }}>{[contact.role, contact.company].filter(Boolean).join(' · ') || 'No details'}</p>
                   </div>
-                  <button onClick={() => { if(confirm(`Delete ${contact.name}?`)) deleteContact.mutate({ id:contact.id }) }}
-                    style={{ background:'transparent', border:'none', cursor:'pointer', color:'var(--t3)', padding:'4px', borderRadius:'6px' }} title="Delete contact">
+                  <button onClick={() => setShowEdit(true)}
+                    style={{ background:'transparent', border:'none', cursor:'pointer', color:'var(--t3)', padding:'4px', borderRadius:'6px' }} title="Edit contact" aria-label="Edit contact">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                    </svg>
+                  </button>
+                  <button onClick={() => setConfirmDelete({ id: contact.id, name: contact.name })}
+                    disabled={deleteContact.isPending}
+                    style={{ background:'transparent', border:'none', cursor:'pointer', color:'var(--t3)', padding:'4px', borderRadius:'6px', opacity: deleteContact.isPending ? 0.5 : 1 }} title="Delete contact" aria-label="Delete contact">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                       <path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
                       <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
@@ -346,7 +412,34 @@ export default function CRMPage() {
       </div>
 
       {showAdd && <AddModal onClose={() => setShowAdd(false)} onSuccess={() => refetch()} />}
+      {showEdit && contact && <EditModal contact={contact} onClose={() => setShowEdit(false)} onSuccess={() => { refetch(); refetchContact() }} />}
       {showLog && contact && <LogModal contactId={contact.id} contactName={contact.name} onClose={() => setShowLog(false)} onSuccess={() => refetchContact()} />}
+      {confirmDelete && (
+        <div className="modal-overlay" onClick={e => e.target === e.currentTarget && setConfirmDelete(null)}>
+          <div className="modal-box" style={{ width: '380px' }}>
+            <div style={{ marginBottom: '20px' }}>
+              <h2 style={{ fontSize: '16px', fontWeight: 600, color: 'var(--t1)', marginBottom: '8px' }}>Delete contact</h2>
+              <p style={{ fontSize: '13.5px', color: 'var(--t2)', lineHeight: 1.6 }}>
+                Are you sure you want to delete <strong>{confirmDelete.name}</strong>? This will remove all their interactions and cannot be undone.
+              </p>
+            </div>
+            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+              <button className="btn-secondary btn-sm" onClick={() => setConfirmDelete(null)}>Cancel</button>
+              <button
+                className="btn-sm"
+                disabled={deleteContact.isPending}
+                style={{ background: 'var(--err)', color: '#fff', border: 'none', borderRadius: '7px', padding: '0 14px', height: '32px', fontSize: '13px', fontWeight: 500, cursor: 'pointer', opacity: deleteContact.isPending ? 0.7 : 1 }}
+                onClick={() => {
+                  deleteContact.mutate({ id: confirmDelete.id })
+                  setConfirmDelete(null)
+                }}
+              >
+                {deleteContact.isPending ? 'Deleting…' : 'Delete'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
