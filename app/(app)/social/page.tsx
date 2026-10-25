@@ -91,7 +91,7 @@ export default function SocialPage() {
     body:     { flex: 1, display: 'grid', gridTemplateColumns: '1fr 290px', overflow: 'hidden' } as React.CSSProperties,
     write:    { display: 'flex', flexDirection: 'column', borderRight: '1px solid var(--b1)', overflow: 'hidden' } as React.CSSProperties,
     platRow:  { display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 20px', borderBottom: '1px solid var(--b0)', background: 'var(--s1)', flexWrap: 'wrap' } as React.CSSProperties,
-    aiBar:    { display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 20px', borderBottom: '1px solid var(--b0)', background: 'var(--s2)' } as React.CSSProperties,
+    aiBar:    { display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 20px', borderTop: '1px solid var(--b1)', borderBottom: '1px solid var(--b0)', background: 'var(--vd)' } as React.CSSProperties,
     textarea: { flex: 1, width: '100%', padding: '22px 24px', background: 'var(--bg)', border: 'none', outline: 'none', resize: 'none', fontSize: '14.5px', color: 'var(--t1)', fontFamily: 'var(--sans)', fontWeight: 300, lineHeight: 1.8, letterSpacing: '-0.01em' } as React.CSSProperties,
     toolbar:  { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 20px', borderTop: '1px solid var(--b0)', background: 'var(--s1)', flexShrink: 0 } as React.CSSProperties,
     preview:  { display: 'flex', flexDirection: 'column', background: 'var(--s1)', overflow: 'hidden' } as React.CSSProperties,
@@ -222,7 +222,7 @@ export default function SocialPage() {
                 background: 'var(--s2)', border: '1px solid var(--b2)',
                 borderRadius: '7px', color: 'var(--t1)', fontSize: '12.5px',
                 fontFamily: 'var(--sans)', cursor: 'pointer', outline: 'none',
-                backgroundImage: `url("data:image/svg+xml,%3Csvg width='10' height='7' viewBox='0 0 10 7' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%235C5878' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E")`,
+                backgroundImage: `url("data:image/svg+xml,%3Csvg width='10' height='7' viewBox='0 0 10 7' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%238B88A8' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E")`,
                 backgroundRepeat: 'no-repeat', backgroundPosition: 'right 8px center',
               }}>
                 {TIMES.map(t => <option key={t.label} value={t.label}>{t.label}</option>)}
@@ -254,7 +254,7 @@ export default function SocialPage() {
                     scheduledAt: parseScheduledTime(scheduledTime),
                   })
                 }}
-                style={schedStatus === 'saved' ? { background: 'var(--ok)', color: '#071a0e' } : {}}
+                style={schedStatus === 'saved' ? { background: 'var(--ok)', color: '#fff' } : {}}
               >
                 {schedulePost.isPending ? 'Scheduling...' : schedStatus === 'saved' ? '✓ Scheduled' : 'Schedule'}
               </button>
