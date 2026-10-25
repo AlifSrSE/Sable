@@ -29,8 +29,8 @@ export function ThemeToggle() {
         cursor-pointer
       "
       style={{
-        background:   'var(--btn-secondary-bg)',
-        borderColor:  'var(--btn-secondary-border)',
+        background:   'var(--btn-sec-bg)',
+        borderColor:  'var(--btn-sec-border)',
         color:        'var(--t2)',
       }}
       aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
