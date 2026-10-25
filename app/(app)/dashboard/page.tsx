@@ -58,7 +58,7 @@ export default async function DashboardPage() {
     grid:       { display: 'grid', gridTemplateColumns: '1fr 288px', gap: '16px' },
     leftPanel:  { background: 'var(--s1)', border: '1px solid var(--b1)', borderRadius: '12px', overflow: 'hidden', display: 'flex', flexDirection: 'column' },
     panelHead:  { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', borderBottom: '1px solid var(--b0)' },
-    statsRow:   { display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', borderBottom: '1px solid var(--b0)' },
+    statsRow:   { display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', borderBottom: '1px solid var(--b1)' },
     statCell:   { padding: '14px 20px' },
     statVal:    { fontFamily: 'var(--serif)', fontSize: '1.9rem', color: 'var(--t1)', letterSpacing: '-0.04em', lineHeight: 1 },
     statLabel:  { fontSize: '11px', color: 'var(--t3)', marginTop: '4px' },
@@ -110,7 +110,7 @@ export default async function DashboardPage() {
               <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--v)', display: 'inline-block' }} />
               <span style={{ fontSize: '13px', fontWeight: 500, color: 'var(--t1)' }}>Upcoming posts</span>
             </div>
-            <a href="/calendar" style={{ fontSize: '12.5px', color: 'var(--t3)', textDecoration: 'none' }}>View calendar →</a>
+            <Link href="/calendar" style={{ fontSize: '12.5px', color: 'var(--t3)', textDecoration: 'none' }}>View calendar →</Link>
           </div>
           <div style={C.statsRow}>
             {[
