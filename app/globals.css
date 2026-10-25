@@ -5,93 +5,109 @@
 @tailwind utilities;
 
 /* ─────────────────────────────────────
-   DARK MODE (default)
+   DARK MODE (default) — Kinetic Editorial
+   Surface hierarchy: obsidian depths + violet-lavender luminescence
 ───────────────────────────────────── */
 :root {
-  --bg:   #0C0B14;
-  --s1:   #131221;
-  --s2:   #1A1927;
-  --s3:   #211F30;
-  --s4:   #2A2840;
-  --s5:   #343250;
+  /* Canvas & Surface Elevation */
+  --bg:   #0e0d16;   /* surface-container-lowest */
+  --s1:   #1c1a24;   /* surface-container-low    */
+  --s2:   #201e28;   /* surface-container        */
+  --s3:   #2a2933;   /* surface-container-high   */
+  --s4:   #35333e;   /* surface-container-highest */
+  --s5:   #3a3842;   /* surface-bright           */
 
+  /* Boundary Tones — translucent whites */
   --b0: rgba(255,255,255,0.04);
   --b1: rgba(255,255,255,0.08);
-  --b2: rgba(255,255,255,0.13);
-  --b3: rgba(255,255,255,0.22);
+  --b2: rgba(255,255,255,0.14);
+  --b3: rgba(255,255,255,0.24);
 
-  --t1: #EAE6FF;
-  --t2: #A09DB8;
-  --t3: #5C5878;
-  --t4: #332F4A;
+  /* Editorial Ink Hierarchy */
+  --t1: #e5e0ee;   /* on-surface: primary text    */
+  --t2: #c9c4d7;   /* on-surface-variant: body    */
+  --t3: #928ea0;   /* outline: muted/placeholders  */
+  --t4: #474554;   /* outline-variant: dividers    */
 
-  --v:   #7C6AF7;
-  --vh:  #6A58E5;
-  --vd:  rgba(124,106,247,0.12);
-  --vm:  rgba(124,106,247,0.20);
+  /* Primary Accent — light lavender on dark (M3 dark primary) */
+  --v:   #c7bfff;
+  --vh:  #8e7fff;
+  --vd:  rgba(199,191,255,0.12);
+  --vm:  rgba(199,191,255,0.20);
 
-  --teal:      #2DD4BF;
-  --teal-dim:  rgba(45,212,191,0.12);
-  --coral:     #F4845F;
-  --coral-dim: rgba(244,132,95,0.12);
+  /* Semantic Accents */
+  --teal:      #44e2cd;   /* secondary */
+  --teal-dim:  rgba(68,226,205,0.12);
+  --coral:     #ffb59d;   /* tertiary  */
+  --coral-dim: rgba(255,181,157,0.12);
   --amber:     #FCD34D;
   --amber-dim: rgba(252,211,77,0.10);
 
-  --ok:      #4ADE80;
-  --ok-dim:  rgba(74,222,128,0.12);
-  --err:     #F87171;
-  --err-dim: rgba(248,113,113,0.12);
+  /* Status */
+  --ok:      #34d399;
+  --ok-dim:  rgba(52,211,153,0.12);
+  --err:     #ffb4ab;
+  --err-dim: rgba(255,180,171,0.12);
 
-  --input-bg:          var(--s2);
-  --input-border:      var(--b2);
-  --input-border-hover:var(--b3);
-  --input-focus:       var(--v);
-  --input-text:        var(--t1);
-  --input-ph:          var(--t3);
-  --input-shadow:      var(--vd);
+  /* Component Aliases */
+  --input-bg:           var(--s1);
+  --input-border:       var(--b2);
+  --input-border-hover: var(--b3);
+  --input-focus:        var(--v);
+  --input-text:         var(--t1);
+  --input-ph:           var(--t3);
+  --input-shadow:       var(--vd);
 
-  --btn-sec-bg:     rgba(255,255,255,0.07);
-  --btn-sec-hover:  rgba(255,255,255,0.12);
+  --btn-sec-bg:     rgba(255,255,255,0.06);
+  --btn-sec-hover:  rgba(255,255,255,0.11);
   --btn-sec-text:   var(--t2);
   --btn-sec-border: var(--b2);
 
-  --modal-bg:       var(--s1);
-  --modal-border:   var(--b2);
-  --modal-overlay:  rgba(0,0,0,0.72);
+  --modal-bg:      var(--s1);
+  --modal-border:  var(--b2);
+  --modal-overlay: rgba(0,0,0,0.72);
 
-  --card-bg:        var(--s1);
-  --card-border:    var(--b1);
+  --btn-primary-text: #2b009e;   /* on-primary in dark */
+
+  --card-bg:     var(--s1);
+  --card-border: var(--b1);
 
   --serif: 'DM Serif Display', Georgia, serif;
   --sans:  'DM Sans', system-ui, sans-serif;
 }
 
 /* ─────────────────────────────────────
-   LIGHT MODE
+   LIGHT MODE — Porcelain Editorial
+   High-key ivory-violet palette, hairline borders, no synthetic shadows
 ───────────────────────────────────── */
 [data-theme="light"] {
-  --bg:  #F2F1F8;
-  --s1:  #FFFFFF;
-  --s2:  #F0EFF7;
-  --s3:  #E6E4F0;
-  --s4:  #D8D6EC;
-  --s5:  #CCCAE0;
+  /* Canvas & Surface Elevation */
+  --bg:  #fcf8ff;   /* background                 */
+  --s1:  #ffffff;   /* surface-container-lowest   */
+  --s2:  #f6f1ff;   /* surface-container-low      */
+  --s3:  #f0ebfe;   /* surface-container          */
+  --s4:  #eae6f8;   /* surface-container-high     */
+  --s5:  #e4e0f2;   /* surface-container-highest  */
 
-  --b0: rgba(0,0,0,0.04);
+  /* Boundary Tones — translucent blacks (hairline) */
+  --b0: rgba(0,0,0,0.05);
   --b1: rgba(0,0,0,0.08);
   --b2: rgba(0,0,0,0.14);
   --b3: rgba(0,0,0,0.24);
 
-  --t1: #0F0E1A;
-  --t2: #4A4760;
-  --t3: #8B88A8;
-  --t4: #C0BDD4;
+  /* Editorial Ink Hierarchy */
+  --t1: #1b1a27;   /* on-surface: near-black ink */
+  --t2: #474555;   /* on-surface-variant         */
+  --t3: #787587;   /* outline: muted             */
+  --t4: #c8c4d8;   /* outline-variant: dividers  */
 
-  --v:   #5B4AE8;
-  --vh:  #4A3AD4;
+  /* Primary Accent — deep ink-violet on light (M3 light primary) */
+  --v:   #5b4ae8;   /* primary-container / interactive */
+  --vh:  #4a3ad4;
   --vd:  rgba(91,74,232,0.08);
   --vm:  rgba(91,74,232,0.15);
 
+  /* Semantic Accents */
   --teal:      #0D9488;
   --teal-dim:  rgba(13,148,136,0.10);
   --coral:     #D95A30;
@@ -99,27 +115,31 @@
   --amber:     #B45309;
   --amber-dim: rgba(180,83,9,0.10);
 
+  /* Status */
   --ok:      #16A34A;
   --ok-dim:  rgba(22,163,74,0.10);
-  --err:     #DC2626;
-  --err-dim: rgba(220,38,38,0.10);
+  --err:     #ba1a1a;
+  --err-dim: rgba(186,26,26,0.10);
 
-  --input-bg:           #FFFFFF;
-  --input-border:       rgba(0,0,0,0.16);
-  --input-border-hover: rgba(0,0,0,0.28);
+  /* Component Aliases */
+  --input-bg:           var(--s1);
+  --input-border:       rgba(0,0,0,0.14);
+  --input-border-hover: rgba(0,0,0,0.24);
   --input-focus:        var(--v);
-  --input-text:         #0F0E1A;
-  --input-ph:           #8B88A8;
-  --input-shadow:       rgba(91,74,232,0.10);
+  --input-text:         var(--t1);
+  --input-ph:           var(--t3);
+  --input-shadow:       rgba(91,74,232,0.12);
 
-  --btn-sec-bg:     rgba(0,0,0,0.05);
-  --btn-sec-hover:  rgba(0,0,0,0.09);
-  --btn-sec-text:   #4A4760;
-  --btn-sec-border: rgba(0,0,0,0.16);
+  --btn-sec-bg:     rgba(0,0,0,0.04);
+  --btn-sec-hover:  rgba(0,0,0,0.08);
+  --btn-sec-text:   var(--t2);
+  --btn-sec-border: rgba(0,0,0,0.14);
 
   --modal-bg:      #FFFFFF;
-  --modal-border:  rgba(0,0,0,0.18);
-  --modal-overlay: rgba(0,0,0,0.55);
+  --modal-border:  rgba(0,0,0,0.14);
+  --modal-overlay: rgba(15,14,26,0.5);
+
+  --btn-primary-text: #ffffff;   /* on-primary in light */
 
   --card-bg:     #FFFFFF;
   --card-border: rgba(0,0,0,0.08);
@@ -153,7 +173,7 @@ body { min-height: 100vh; }
 ::selection { background: var(--vm); color: var(--t1); }
 
 /* ─────────────────────────────────────
-   GLOBAL INPUTS — used across all pages
+   GLOBAL INPUTS
 ───────────────────────────────────── */
 .sable-input {
   width: 100%;
@@ -161,7 +181,7 @@ body { min-height: 100vh; }
   padding: 0 12px;
   background: var(--input-bg);
   border: 1px solid var(--input-border);
-  border-radius: 8px;
+  border-radius: 6px;
   color: var(--input-text);
   font-size: 13.5px;
   font-family: var(--sans);
@@ -180,7 +200,7 @@ body { min-height: 100vh; }
   padding: 12px;
   background: var(--input-bg);
   border: 1px solid var(--input-border);
-  border-radius: 8px;
+  border-radius: 6px;
   color: var(--input-text);
   font-size: 13.5px;
   font-family: var(--sans);
@@ -205,12 +225,12 @@ body { min-height: 100vh; }
   height: 36px;
   padding: 0 16px;
   background: var(--v);
-  color: #fff;
+  color: var(--btn-primary-text);
   font-size: 13.5px;
   font-weight: 500;
   font-family: var(--sans);
   border: none;
-  border-radius: 8px;
+  border-radius: 6px;
   cursor: pointer;
   transition: background 120ms, transform 100ms, box-shadow 120ms;
   white-space: nowrap;
@@ -232,7 +252,7 @@ body { min-height: 100vh; }
   font-weight: 400;
   font-family: var(--sans);
   border: 1px solid var(--btn-sec-border);
-  border-radius: 8px;
+  border-radius: 6px;
   cursor: pointer;
   transition: all 120ms;
   white-space: nowrap;
@@ -253,7 +273,7 @@ body { min-height: 100vh; }
   font-size: 13px;
   font-family: var(--sans);
   border: none;
-  border-radius: 7px;
+  border-radius: 6px;
   cursor: pointer;
   transition: all 120ms;
 }
@@ -267,7 +287,7 @@ body { min-height: 100vh; }
 .sable-card {
   background: var(--card-bg);
   border: 1px solid var(--card-border);
-  border-radius: 12px;
+  border-radius: 10px;
   overflow: hidden;
 }
 
@@ -314,7 +334,7 @@ body { min-height: 100vh; }
 .modal-box {
   background: var(--modal-bg);
   border: 1px solid var(--modal-border);
-  border-radius: 16px;
+  border-radius: 14px;
   padding: 28px;
   box-shadow: 0 24px 64px rgba(0,0,0,0.3);
   animation: slideUp 180ms cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -352,8 +372,7 @@ body { min-height: 100vh; }
 .animate-spin    { animation: spin 1s linear infinite; }
 
 /* ─────────────────────────────────────
-   TAILWIND DARK/LIGHT TOKEN HELPERS
-   Use these classes anywhere in JSX
+   TAILWIND UTILITY HELPERS
 ───────────────────────────────────── */
 .bg-surface  { background: var(--s1); }
 .bg-surface2 { background: var(--s2); }
