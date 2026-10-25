@@ -2,7 +2,8 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { UserButton } from '@clerk/nextjs'
+import { UserButton, useUser } from '@clerk/nextjs'
+import { trpc } from '@/lib/trpc'
 import { SableMark } from '@/components/ui/SableMark'
 import { ThemeToggle } from '@/components/ui/ThemeToggle'
 
@@ -18,9 +19,9 @@ const NAV = [
   {
     label: 'Pillars',
     items: [
-      { label: 'Social', href: '/social',  badge: '3', badgeStyle: { background: 'var(--vd)', color: 'var(--v)' } },
-      { label: 'CRM',    href: '/crm',     badge: '!', badgeStyle: { background: 'var(--coral-dim)', color: 'var(--coral)' } },
-      { label: 'Audio',  href: '/audio',   badge: '7', badgeStyle: { background: 'var(--teal-dim)', color: 'var(--teal)' } },
+      { label: 'Social', href: '/social' },
+      { label: 'CRM',    href: '/crm' },
+      { label: 'Audio',  href: '/audio' },
     ],
   },
   {
@@ -34,6 +35,22 @@ const NAV = [
 
 export function Sidebar() {
   const pathname = usePathname()
+  const { user } = useUser()
+  const { data: postStats }    = trpc.posts.stats.useQuery(undefined, { staleTime: 60000 })
+  const { data: contactStats } = trpc.contacts.stats.useQuery(undefined, { staleTime: 60000 })
+
+  const scheduledCount = postStats?.scheduledPosts ?? 0
+  const attentionCount = contactStats?.needsAttention ?? 0
+
+  const BADGES: Record<string, { value: string; style: React.CSSProperties } | null> = {
+    '/social': scheduledCount > 0 ? { value: String(scheduledCount), style: { background: 'var(--vd)', color: 'var(--v)' } } : null,
+    '/crm':    attentionCount > 0 ? { value: attentionCount > 9 ? '9+' : String(attentionCount), style: { background: 'var(--coral-dim)', color: 'var(--coral)' } } : null,
+    '/audio':  null,
+  }
+
+  const displayName = user?.firstName
+    ? `${user.firstName}${user.lastName ? ' ' + user.lastName : ''}`
+    : user?.primaryEmailAddress?.emailAddress ?? 'My Account'
 
   return (
     <aside style={{
@@ -81,9 +98,9 @@ export function Sidebar() {
                         <span style={{ position: 'absolute', left: 0, top: '6px', bottom: '6px', width: '2px', background: 'var(--v)', borderRadius: '0 2px 2px 0' }} />
                       )}
                       {item.label}
-                      {'badge' in item && item.badge && (
-                        <span style={{ fontSize: '10px', fontWeight: 600, padding: '2px 6px', borderRadius: '4px', ...item.badgeStyle }}>
-                          {item.badge}
+                      {BADGES[item.href] && (
+                        <span style={{ fontSize: '10px', fontWeight: 600, padding: '2px 6px', borderRadius: '4px', ...BADGES[item.href]!.style }}>
+                          {BADGES[item.href]!.value}
                         </span>
                       )}
                     </Link>
@@ -98,8 +115,8 @@ export function Sidebar() {
       <div style={{ borderTop: '1px solid var(--b1)', padding: '12px 14px', display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
         <UserButton afterSignOutUrl="/" />
         <div style={{ flex: 1, minWidth: 0 }}>
-          <p style={{ fontSize: '12.5px', fontWeight: 500, color: 'var(--t1)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>My Account</p>
-          <p style={{ fontSize: '11px', color: 'var(--t3)' }}>Growth plan</p>
+          <p style={{ fontSize: '12.5px', fontWeight: 500, color: 'var(--t1)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{displayName}</p>
+          <p style={{ fontSize: '11px', color: 'var(--t3)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.primaryEmailAddress?.emailAddress ?? ''}</p>
         </div>
       </div>
     </aside>
