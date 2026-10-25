@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { trpc } from '@/lib/trpc'
 
 interface Episode {
   id: string; podcast: string; title: string; duration: string
@@ -24,10 +25,31 @@ const EPISODES: Episode[] = [
 export default function AudioPage() {
   const [selected,  setSelected]  = useState<string|null>('1')
   const [feedUrl,   setFeedUrl]    = useState('')
-  const [showAdd,   setShowAdd]    = useState(false)
-  const [activeTab, setActiveTab]  = useState<'brief'|'library'>('brief')
+  const [showAdd,      setShowAdd]      = useState(false)
+  const [activeTab,    setActiveTab]    = useState<'brief'|'library'>('brief')
+  const [subscribeErr, setSubscribeErr] = useState('')
+  const [subscribed,   setSubscribed]   = useState(false)
+
+  const subscribeMut = trpc.podcasts.subscribe.useMutation({
+    onSuccess: () => {
+      setSubscribed(true)
+      setTimeout(() => {
+        setShowAdd(false)
+        setFeedUrl('')
+        setSubscribed(false)
+      }, 1200)
+    },
+    onError: (err) => setSubscribeErr(err.message),
+  })
 
   const ep = EPISODES.find(e => e.id === selected)
+
+  useEffect(() => {
+    if (!showAdd) return
+    const h = (e: KeyboardEvent) => { if (e.key === 'Escape') { setShowAdd(false); setSubscribeErr(''); setFeedUrl('') } }
+    document.addEventListener('keydown', h)
+    return () => document.removeEventListener('keydown', h)
+  }, [showAdd])
 
   return (
     <div style={{ display:'flex', flexDirection:'column', height:'100%', overflow:'hidden' }}>
@@ -96,7 +118,14 @@ export default function AudioPage() {
                   <p style={{ fontSize:'13px', color:'var(--t1)', lineHeight:1.45, marginBottom:'5px' }}>{e.title}</p>
                   <div style={{ display:'flex', alignItems:'center', gap:'10px' }}>
                     <span style={{ fontSize:'11px', color:'var(--t3)' }}>{e.duration}</span>
-                    {e.processing && <span style={{ fontSize:'11px', color:'var(--v)' }}>Processing...</span>}
+                    {e.processing && (
+                      <span style={{ display:'inline-flex', alignItems:'center', gap:'4px', fontSize:'10.5px', fontWeight:500, color:'var(--v)', background:'var(--vd)', borderRadius:'4px', padding:'1px 7px' }}>
+                        <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ animation:'spin 1.2s linear infinite', flexShrink:0 }}>
+                          <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4"/>
+                        </svg>
+                        Transcribing
+                      </span>
+                    )}
                     {!e.processing && e.insights > 0 && <span style={{ fontSize:'11px', color:'var(--t3)' }}>{e.insights} insights</span>}
                     {e.listened && <span style={{ fontSize:'11px', color:'var(--ok)', display:'flex', alignItems:'center', gap:'3px' }}>
                       <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M20 6L9 17l-5-5"/></svg>
@@ -193,9 +222,27 @@ export default function AudioPage() {
                 ))}
               </div>
             </div>
+            {subscribeErr && (
+              <p style={{ fontSize:'12px', color:'var(--err)', marginBottom:'10px' }}>{subscribeErr}</p>
+            )}
             <div style={{ display:'flex', gap:'8px', justifyContent:'flex-end' }}>
-              <button className="btn-secondary" onClick={() => setShowAdd(false)}>Cancel</button>
-              <button className="btn-primary" onClick={() => setShowAdd(false)} disabled={!feedUrl.trim()}>Subscribe</button>
+              <button className="btn-secondary" onClick={() => { setShowAdd(false); setSubscribeErr(''); setFeedUrl('') }}>Cancel</button>
+              <button
+                className="btn-primary"
+                disabled={!feedUrl.trim() || subscribeMut.isPending || subscribed}
+                onClick={() => {
+                  setSubscribeErr('')
+                  const PODCAST_NAMES: Record<string, string> = {
+                    'https://feeds.simplecast.com/OyeGSGSq': "Lenny's Podcast",
+                    'https://feeds.megaphone.fm/MFM2426690007': 'My First Million',
+                    'https://feeds.npr.org/510313/podcast.xml': 'How I Built This',
+                  }
+                  subscribeMut.mutate({ feedUrl, title: PODCAST_NAMES[feedUrl] })
+                }}
+                style={subscribed ? { background: 'var(--ok)', color: '#071a0e' } : {}}
+              >
+                {subscribeMut.isPending ? 'Subscribing…' : subscribed ? '✓ Subscribed' : 'Subscribe'}
+              </button>
             </div>
           </div>
         </div>
