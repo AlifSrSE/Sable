@@ -4,14 +4,16 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ─── DARK MODE (default) ─── */
+/* ─────────────────────────────────────
+   DARK MODE (default)
+───────────────────────────────────── */
 :root {
-  --bg:         #0C0B14;
-  --s1:         #131221;
-  --s2:         #1A1927;
-  --s3:         #211F30;
-  --s4:         #2A2840;
-  --s5:         #343250;
+  --bg:   #0C0B14;
+  --s1:   #131221;
+  --s2:   #1A1927;
+  --s3:   #211F30;
+  --s4:   #2A2840;
+  --s5:   #343250;
 
   --b0: rgba(255,255,255,0.04);
   --b1: rgba(255,255,255,0.08);
@@ -28,84 +30,104 @@
   --vd:  rgba(124,106,247,0.12);
   --vm:  rgba(124,106,247,0.20);
 
-  --teal:       #2DD4BF;
-  --teal-dim:   rgba(45,212,191,0.12);
-  --coral:      #F4845F;
-  --coral-dim:  rgba(244,132,95,0.12);
-  --amber:      #FCD34D;
-  --amber-dim:  rgba(252,211,77,0.10);
+  --teal:      #2DD4BF;
+  --teal-dim:  rgba(45,212,191,0.12);
+  --coral:     #F4845F;
+  --coral-dim: rgba(244,132,95,0.12);
+  --amber:     #FCD34D;
+  --amber-dim: rgba(252,211,77,0.10);
 
-  --ok:         #4ADE80;
-  --ok-dim:     rgba(74,222,128,0.12);
-  --err:        #F87171;
-  --err-dim:    rgba(248,113,113,0.12);
+  --ok:      #4ADE80;
+  --ok-dim:  rgba(74,222,128,0.12);
+  --err:     #F87171;
+  --err-dim: rgba(248,113,113,0.12);
 
-  /* Input specific */
-  --input-bg:      #1A1927;
-  --input-border:  rgba(255,255,255,0.13);
-  --input-focus:   #7C6AF7;
-  --input-text:    #EAE6FF;
-  --input-placeholder: #5C5878;
+  --input-bg:          var(--s2);
+  --input-border:      var(--b2);
+  --input-border-hover:var(--b3);
+  --input-focus:       var(--v);
+  --input-text:        var(--t1);
+  --input-ph:          var(--t3);
+  --input-shadow:      var(--vd);
 
-  /* Button */
-  --btn-secondary-bg:     rgba(255,255,255,0.07);
-  --btn-secondary-hover:  rgba(255,255,255,0.12);
-  --btn-secondary-text:   #A09DB8;
-  --btn-secondary-border: rgba(255,255,255,0.13);
+  --btn-sec-bg:     rgba(255,255,255,0.07);
+  --btn-sec-hover:  rgba(255,255,255,0.12);
+  --btn-sec-text:   var(--t2);
+  --btn-sec-border: var(--b2);
+
+  --modal-bg:       var(--s1);
+  --modal-border:   var(--b2);
+  --modal-overlay:  rgba(0,0,0,0.72);
+
+  --card-bg:        var(--s1);
+  --card-border:    var(--b1);
 
   --serif: 'DM Serif Display', Georgia, serif;
   --sans:  'DM Sans', system-ui, sans-serif;
 }
 
-/* ─── LIGHT MODE ─── */
+/* ─────────────────────────────────────
+   LIGHT MODE
+───────────────────────────────────── */
 [data-theme="light"] {
-  --bg:  #F4F3F8;
+  --bg:  #F2F1F8;
   --s1:  #FFFFFF;
-  --s2:  #F0EFF6;
+  --s2:  #F0EFF7;
   --s3:  #E6E4F0;
-  --s4:  #DAD8EC;
+  --s4:  #D8D6EC;
   --s5:  #CCCAE0;
 
   --b0: rgba(0,0,0,0.04);
   --b1: rgba(0,0,0,0.08);
-  --b2: rgba(0,0,0,0.13);
-  --b3: rgba(0,0,0,0.22);
+  --b2: rgba(0,0,0,0.14);
+  --b3: rgba(0,0,0,0.24);
 
   --t1: #0F0E1A;
   --t2: #4A4760;
   --t3: #8B88A8;
-  --t4: #C4C2D0;
+  --t4: #C0BDD4;
 
   --v:   #5B4AE8;
   --vh:  #4A3AD4;
-  --vd:  rgba(91,74,232,0.10);
-  --vm:  rgba(91,74,232,0.18);
+  --vd:  rgba(91,74,232,0.08);
+  --vm:  rgba(91,74,232,0.15);
 
-  --teal:       #0D9488;
-  --teal-dim:   rgba(13,148,136,0.10);
-  --coral:      #E05A30;
-  --coral-dim:  rgba(224,90,48,0.10);
-  --amber:      #D97706;
-  --amber-dim:  rgba(217,119,6,0.10);
+  --teal:      #0D9488;
+  --teal-dim:  rgba(13,148,136,0.10);
+  --coral:     #D95A30;
+  --coral-dim: rgba(217,90,48,0.10);
+  --amber:     #B45309;
+  --amber-dim: rgba(180,83,9,0.10);
 
-  --ok:         #16A34A;
-  --ok-dim:     rgba(22,163,74,0.10);
-  --err:        #DC2626;
-  --err-dim:    rgba(220,38,38,0.10);
+  --ok:      #16A34A;
+  --ok-dim:  rgba(22,163,74,0.10);
+  --err:     #DC2626;
+  --err-dim: rgba(220,38,38,0.10);
 
-  --input-bg:      #FFFFFF;
-  --input-border:  rgba(0,0,0,0.13);
-  --input-focus:   #5B4AE8;
-  --input-text:    #0F0E1A;
-  --input-placeholder: #8B88A8;
+  --input-bg:           #FFFFFF;
+  --input-border:       rgba(0,0,0,0.16);
+  --input-border-hover: rgba(0,0,0,0.28);
+  --input-focus:        var(--v);
+  --input-text:         #0F0E1A;
+  --input-ph:           #8B88A8;
+  --input-shadow:       rgba(91,74,232,0.10);
 
-  --btn-secondary-bg:     rgba(0,0,0,0.05);
-  --btn-secondary-hover:  rgba(0,0,0,0.08);
-  --btn-secondary-text:   #4A4760;
-  --btn-secondary-border: rgba(0,0,0,0.13);
+  --btn-sec-bg:     rgba(0,0,0,0.05);
+  --btn-sec-hover:  rgba(0,0,0,0.09);
+  --btn-sec-text:   #4A4760;
+  --btn-sec-border: rgba(0,0,0,0.16);
+
+  --modal-bg:      #FFFFFF;
+  --modal-border:  rgba(0,0,0,0.18);
+  --modal-overlay: rgba(0,0,0,0.55);
+
+  --card-bg:     #FFFFFF;
+  --card-border: rgba(0,0,0,0.08);
 }
 
-/* ─── RESET ─── */
+/* ─────────────────────────────────────
+   RESET
+───────────────────────────────────── */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -119,30 +141,20 @@ html {
   font-size: 15px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
-  transition: background 200ms ease, color 200ms ease;
 }
 
 body { min-height: 100vh; }
 
-/* ─── SCROLLBAR ─── */
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--s4); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--s5); }
 
-/* ─── SELECTION ─── */
 ::selection { background: var(--vm); color: var(--t1); }
 
-/* ─── FOCUS ─── */
-:focus-visible {
-  outline: 2px solid var(--v);
-  outline-offset: 2px;
-  border-radius: 4px;
-}
-
-/* ─── GLOBAL COMPONENT CLASSES ─── */
-
-/* Inputs — consistent across all pages */
+/* ─────────────────────────────────────
+   GLOBAL INPUTS — used across all pages
+───────────────────────────────────── */
 .sable-input {
   width: 100%;
   height: 38px;
@@ -156,37 +168,36 @@ body { min-height: 100vh; }
   outline: none;
   transition: border-color 120ms, box-shadow 120ms;
 }
-
-.sable-input::placeholder { color: var(--input-placeholder); }
-.sable-input:hover  { border-color: var(--b2); }
+.sable-input::placeholder { color: var(--input-ph); }
+.sable-input:hover  { border-color: var(--input-border-hover); }
 .sable-input:focus  {
   border-color: var(--input-focus);
-  box-shadow: 0 0 0 3px var(--vd);
+  box-shadow: 0 0 0 3px var(--input-shadow);
 }
 
 .sable-textarea {
   width: 100%;
-  padding: 14px;
+  padding: 12px;
   background: var(--input-bg);
   border: 1px solid var(--input-border);
   border-radius: 8px;
   color: var(--input-text);
-  font-size: 14px;
+  font-size: 13.5px;
   font-family: var(--sans);
-  font-weight: 300;
-  line-height: 1.75;
+  line-height: 1.7;
   outline: none;
   resize: none;
   transition: border-color 120ms;
 }
-
-.sable-textarea::placeholder { color: var(--input-placeholder); }
+.sable-textarea::placeholder { color: var(--input-ph); }
 .sable-textarea:focus {
   border-color: var(--input-focus);
-  box-shadow: 0 0 0 3px var(--vd);
+  box-shadow: 0 0 0 3px var(--input-shadow);
 }
 
-/* Buttons */
+/* ─────────────────────────────────────
+   GLOBAL BUTTONS
+───────────────────────────────────── */
 .btn-primary {
   display: inline-flex;
   align-items: center;
@@ -196,21 +207,18 @@ body { min-height: 100vh; }
   background: var(--v);
   color: #fff;
   font-size: 13.5px;
-  font-family: var(--sans);
   font-weight: 500;
+  font-family: var(--sans);
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  transition: background 120ms, transform 100ms;
+  transition: background 120ms, transform 100ms, box-shadow 120ms;
   white-space: nowrap;
+  text-decoration: none;
 }
-.btn-primary:hover   { background: var(--vh); }
-.btn-primary:active  { transform: scale(0.98); }
-.btn-primary:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-  transform: none;
-}
+.btn-primary:hover  { background: var(--vh); transform: translateY(-1px); box-shadow: 0 4px 16px var(--vd); }
+.btn-primary:active { transform: scale(0.98); }
+.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
 
 .btn-secondary {
   display: inline-flex;
@@ -218,34 +226,21 @@ body { min-height: 100vh; }
   gap: 6px;
   height: 36px;
   padding: 0 14px;
-  background: var(--btn-secondary-bg);
-  color: var(--btn-secondary-text);
+  background: var(--btn-sec-bg);
+  color: var(--btn-sec-text);
   font-size: 13.5px;
-  font-family: var(--sans);
   font-weight: 400;
-  border: 1px solid var(--btn-secondary-border);
+  font-family: var(--sans);
+  border: 1px solid var(--btn-sec-border);
   border-radius: 8px;
   cursor: pointer;
   transition: all 120ms;
   white-space: nowrap;
+  text-decoration: none;
 }
-.btn-secondary:hover {
-  background: var(--btn-secondary-hover);
-  color: var(--t1);
-  border-color: var(--b2);
-}
+.btn-secondary:hover  { background: var(--btn-sec-hover); color: var(--t1); }
 .btn-secondary:active { transform: scale(0.98); }
-.btn-secondary:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-  transform: none;
-}
-
-.btn-sm {
-  height: 30px !important;
-  padding: 0 12px !important;
-  font-size: 12.5px !important;
-}
+.btn-secondary:disabled { opacity: 0.4; cursor: not-allowed; }
 
 .btn-ghost {
   display: inline-flex;
@@ -262,32 +257,36 @@ body { min-height: 100vh; }
   cursor: pointer;
   transition: all 120ms;
 }
-.btn-ghost:hover {
-  background: var(--s2);
-  color: var(--t1);
-}
+.btn-ghost:hover { background: var(--s2); color: var(--t1); }
 
-/* Cards */
+.btn-sm { height: 30px !important; padding: 0 12px !important; font-size: 12.5px !important; }
+
+/* ─────────────────────────────────────
+   CARDS
+───────────────────────────────────── */
 .sable-card {
-  background: var(--s1);
-  border: 1px solid var(--b1);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
   border-radius: 12px;
   overflow: hidden;
 }
 
-/* Page header */
+/* ─────────────────────────────────────
+   PAGE HEADER
+───────────────────────────────────── */
 .page-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 24px 32px;
+  padding: 22px 32px;
   border-bottom: 1px solid var(--b1);
   flex-shrink: 0;
+  background: var(--s1);
 }
 
 .page-title {
   font-family: var(--serif);
-  font-size: 1.7rem;
+  font-size: 1.65rem;
   color: var(--t1);
   letter-spacing: -0.035em;
   line-height: 1.1;
@@ -299,20 +298,57 @@ body { min-height: 100vh; }
   margin-top: 3px;
 }
 
-/* Animations */
+/* ─────────────────────────────────────
+   MODAL OVERLAY
+───────────────────────────────────── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--modal-overlay);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+.modal-box {
+  background: var(--modal-bg);
+  border: 1px solid var(--modal-border);
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.3);
+}
+
+/* ─────────────────────────────────────
+   SIDEBAR SPECIFICS
+───────────────────────────────────── */
+.sidebar-wrap {
+  background: var(--s1);
+  border-right: 1px solid var(--b1);
+}
+
+/* ─────────────────────────────────────
+   ANIMATIONS
+───────────────────────────────────── */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(5px); }
   to   { opacity: 1; transform: translateY(0); }
 }
+@keyframes spin { to { transform: rotate(360deg); } }
 
-@keyframes slideIn {
-  from { opacity: 0; transform: translateX(8px); }
-  to   { opacity: 1; transform: translateX(0); }
-}
+.animate-fade-in { animation: fadeIn 200ms ease-out; }
+.animate-spin    { animation: spin 1s linear infinite; }
 
-.animate-fade-in  { animation: fadeIn 200ms ease-out; }
-.animate-slide-in { animation: slideIn 200ms ease-out; }
-
-/* Theme transition */
-* { transition: background-color 150ms ease, border-color 150ms ease; }
-a, button { transition: all 120ms ease; }
+/* ─────────────────────────────────────
+   TAILWIND DARK/LIGHT TOKEN HELPERS
+   Use these classes anywhere in JSX
+───────────────────────────────────── */
+.bg-surface  { background: var(--s1); }
+.bg-surface2 { background: var(--s2); }
+.bg-surface3 { background: var(--s3); }
+.bg-page     { background: var(--bg); }
+.text-primary   { color: var(--t1); }
+.text-secondary { color: var(--t2); }
+.text-muted     { color: var(--t3); }
+.border-default { border-color: var(--b1); }
+.border-mid     { border-color: var(--b2); }
