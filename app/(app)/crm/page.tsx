@@ -222,7 +222,7 @@ export default function CRMPage() {
       <div style={{ flex:1, display:'grid', gridTemplateColumns:'1fr 320px', overflow:'hidden' }}>
 
         {/* Left */}
-        <div style={{ display:'flex', flexDirection:'column', borderRight:'1px solid var(--b1)', overflow:'hidden' }}>
+        <div style={{ display:'flex', flexDirection:'column', borderRight:'1px solid var(--b1)', overflow:'hidden', background:'var(--s2)' }}>
 
           <div style={{ padding:'12px 20px', borderBottom:'1px solid var(--b0)', background:'var(--s1)' }}>
             <div style={{ position:'relative' }}>
@@ -400,12 +400,24 @@ export default function CRMPage() {
               </div>
             </>
           ) : (
-            <div style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', textAlign:'center', padding:'24px' }}>
-              <div style={{ width:'44px', height:'44px', borderRadius:'12px', background:'var(--s2)', display:'flex', alignItems:'center', justifyContent:'center', marginBottom:'14px' }}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" strokeWidth="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <div style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', textAlign:'center', padding:'40px 24px' }}>
+              <div style={{ width:'56px', height:'56px', borderRadius:'16px', background:'var(--vd)', border:'1px solid var(--vm)', display:'flex', alignItems:'center', justifyContent:'center', marginBottom:'20px' }}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--v)" strokeWidth="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
               </div>
-              <p style={{ fontSize:'13.5px', fontWeight:500, color:'var(--t1)', marginBottom:'6px' }}>Select a contact</p>
-              <p style={{ fontSize:'12.5px', color:'var(--t3)', lineHeight:1.6, maxWidth:'200px' }}>Click any contact to see their details and AI suggestions.</p>
+              <p style={{ fontFamily:'var(--serif)', fontSize:'1.15rem', color:'var(--t1)', letterSpacing:'-0.025em', marginBottom:'8px' }}>No contact selected</p>
+              <p style={{ fontSize:'12.5px', color:'var(--t3)', lineHeight:1.7, maxWidth:'220px', marginBottom:'24px' }}>Pick someone from the list to see their timeline, log an interaction, or get AI relationship suggestions.</p>
+              <div style={{ display:'flex', flexDirection:'column', gap:'8px', width:'100%', maxWidth:'200px' }}>
+                {[
+                  { icon: '📋', text: 'View interaction history' },
+                  { icon: '✏️', text: 'Log a call or meeting' },
+                  { icon: '✨', text: 'Get AI follow-up suggestions' },
+                ].map(({ icon, text }) => (
+                  <div key={text} style={{ display:'flex', alignItems:'center', gap:'10px', padding:'8px 12px', background:'var(--s2)', borderRadius:'8px', fontSize:'12px', color:'var(--t2)', border:'1px solid var(--b1)' }}>
+                    <span style={{ fontSize:'14px' }}>{icon}</span>
+                    <span>{text}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </div>
