@@ -19,21 +19,43 @@ const TIPS: Record<string, string[]> = {
   twitter:   ['Over 280 chars becomes a thread', 'Max 2 hashtags recommended', 'Images get 2× engagement'],
 }
 
-const TIMES = ['Best time: Today 9 AM', 'Today 12 PM', 'Tomorrow 9 AM', 'Tomorrow 6 PM']
+const TIMES = [
+  { label: 'Best time: Today 9 AM',  dayOffset: 0, hour: 9  },
+  { label: 'Today 12 PM',            dayOffset: 0, hour: 12 },
+  { label: 'Tomorrow 9 AM',          dayOffset: 1, hour: 9  },
+  { label: 'Tomorrow 6 PM',          dayOffset: 1, hour: 18 },
+]
+
+function parseScheduledTime(label: string): Date {
+  const entry = TIMES.find(t => t.label === label) ?? TIMES[0]
+  const d = new Date()
+  d.setDate(d.getDate() + entry.dayOffset)
+  d.setHours(entry.hour, 0, 0, 0)
+  return d
+}
 
 export default function SocialPage() {
   const [body,            setBody]           = useState('')
   const [selected,        setSelected]       = useState<Set<string>>(new Set(['linkedin']))
   const [aiPrompt,        setAiPrompt]       = useState('')
   const [generating,      setGenerating]     = useState(false)
-  const [scheduledTime,   setScheduledTime]  = useState(TIMES[0])
+  const [scheduledTime,   setScheduledTime]  = useState(TIMES[0].label)
   const [previewPlatform, setPreview]        = useState('linkedin')
-  const [status,          setStatus]         = useState<'idle'|'saved'>('idle')
+  const [draftStatus,     setDraftStatus]    = useState<'idle'|'saved'>('idle')
+  const [schedStatus,    setSchedStatus]    = useState<'idle'|'saved'>('idle')
+  const [generateError,  setGenerateError]  = useState('')
+  const [shakePlatform,  setShakePlatform]  = useState<string|null>(null)
 
   const togglePlatform = (id: string) => {
     setSelected(prev => {
       const next = new Set(prev)
-      if (next.has(id) && next.size > 1) next.delete(id)
+      if (next.has(id) && next.size === 1) {
+        // Can't deselect the last platform — shake it
+        setShakePlatform(id)
+        setTimeout(() => setShakePlatform(null), 400)
+        return prev
+      }
+      if (next.has(id)) next.delete(id)
       else { next.add(id); setPreview(id) }
       return next
     })
@@ -46,13 +68,26 @@ export default function SocialPage() {
   const generate = async () => {
     if (!aiPrompt.trim()) return
     setGenerating(true)
-    await new Promise(r => setTimeout(r, 1500))
-    setBody(`Here's what nobody tells you about ${aiPrompt}:\n\nThe most important lesson isn't about tactics — it's about consistency and genuine value.\n\nThree things that keep proving themselves true:\n\n1. Show your thinking, not just your conclusions\n2. Your audience is attracted by specificity, not breadth\n3. Your unique perspective is the only thing that can't be replicated\n\nWhat's your experience been?\n\n#${aiPrompt.toLowerCase().replace(/\s+/g, '')} #growth #insights`)
-    setGenerating(false)
+    setGenerateError('')
+    try {
+      const res = await fetch('/api/ai/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ topic: aiPrompt, platforms: [...selected] }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error ?? 'Generation failed')
+      setBody(data.content ?? '')
+    } catch (err: any) {
+      setGenerateError(err.message ?? 'Something went wrong — check OPENROUTER_API_KEY')
+    } finally {
+      setGenerating(false)
+    }
   }
 
   const S = {
     wrap:     { display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' } as React.CSSProperties,
+    bottom:   { borderTop: '1px solid var(--b1)', background: 'var(--s1)', flexShrink: 0 } as React.CSSProperties,
     body:     { flex: 1, display: 'grid', gridTemplateColumns: '1fr 290px', overflow: 'hidden' } as React.CSSProperties,
     write:    { display: 'flex', flexDirection: 'column', borderRight: '1px solid var(--b1)', overflow: 'hidden' } as React.CSSProperties,
     platRow:  { display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 20px', borderBottom: '1px solid var(--b0)', background: 'var(--s1)', flexWrap: 'wrap' } as React.CSSProperties,
@@ -69,12 +104,21 @@ export default function SocialPage() {
   const { data: postsData, isLoading, refetch } = trpc.posts.list.useQuery({
     limit: 20,
   })
-  const createPost = trpc.posts.create.useMutation({
+  const saveDraft = trpc.posts.create.useMutation({
     onSuccess: () => {
       setBody('')
-      setStatus('saved')
+      setDraftStatus('saved')
       refetch()
-      setTimeout(() => setStatus('idle'), 3000)
+      setTimeout(() => setDraftStatus('idle'), 3000)
+    },
+  })
+
+  const schedulePost = trpc.posts.create.useMutation({
+    onSuccess: () => {
+      setBody('')
+      setSchedStatus('saved')
+      refetch()
+      setTimeout(() => setSchedStatus('idle'), 3000)
     },
   })
   return (
@@ -96,20 +140,23 @@ export default function SocialPage() {
               Post to
             </span>
             {PLATFORMS.map(p => (
-              <button key={p.id} onClick={() => togglePlatform(p.id)} style={{
+              <button key={p.id} onClick={() => togglePlatform(p.id)}
+                title={selected.has(p.id) && selected.size === 1 ? 'At least one platform required' : undefined}
+                style={{
                 display: 'inline-flex', alignItems: 'center', padding: '0 12px', height: '28px',
                 borderRadius: '6px', fontSize: '12px', fontWeight: 500, cursor: 'pointer',
                 border: '1px solid', transition: 'all 120ms',
                 color:           selected.has(p.id) ? p.color  : 'var(--t3)',
                 backgroundColor: selected.has(p.id) ? p.dim    : 'transparent',
-                borderColor:     selected.has(p.id) ? p.border : 'var(--b1)',
+                borderColor:     shakePlatform === p.id ? 'var(--err)' : selected.has(p.id) ? p.border : 'var(--b1)',
+                animation:       shakePlatform === p.id ? 'shake 0.35s ease' : undefined,
               }}>
                 {p.label}
               </button>
             ))}
-            <button style={{ padding: '0 10px', height: '28px', borderRadius: '6px', fontSize: '11.5px', color: 'var(--t3)', border: '1px solid var(--b1)', background: 'transparent', cursor: 'pointer' }}>
+            <a href="/connections" style={{ display:'inline-flex', alignItems:'center', padding: '0 10px', height: '28px', borderRadius: '6px', fontSize: '11.5px', color: 'var(--t3)', border: '1px solid var(--b1)', background: 'transparent', cursor: 'pointer', textDecoration:'none', transition:'border-color 120ms' }}>
               + Connect more
-            </button>
+            </a>
           </div>
 
           {/* AI bar */}
@@ -128,6 +175,11 @@ export default function SocialPage() {
               {generating ? 'Writing...' : 'Generate'}
             </button>
           </div>
+          {generateError && (
+            <div style={{ padding: '6px 20px', fontSize: '12px', color: 'var(--err)', background: 'var(--err-dim)', borderBottom: '1px solid var(--b0)' }}>
+              ⚠ {generateError}
+            </div>
+          )}
 
           {/* Textarea */}
           <textarea
@@ -140,7 +192,7 @@ export default function SocialPage() {
           {/* Toolbar */}
           <div style={S.toolbar}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <button className="btn-ghost" style={{ height: '30px', fontSize: '12.5px' }}>
+              <button className="btn-ghost" style={{ height: '30px', fontSize: '12.5px' }} aria-label="Add media">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                   <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
                 </svg>
@@ -173,36 +225,38 @@ export default function SocialPage() {
                 backgroundImage: `url("data:image/svg+xml,%3Csvg width='10' height='7' viewBox='0 0 10 7' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%235C5878' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E")`,
                 backgroundRepeat: 'no-repeat', backgroundPosition: 'right 8px center',
               }}>
-                {TIMES.map(t => <option key={t} value={t}>{t}</option>)}
+                {TIMES.map(t => <option key={t.label} value={t.label}>{t.label}</option>)}
               </select>
               <button className="btn-secondary btn-sm"
-                disabled={!body.trim() || createPost.isPending}
+                disabled={!body.trim() || saveDraft.isPending || schedulePost.isPending}
                 onClick={() => {
                   if (!body.trim()) return
-                  createPost.mutate({
+                  saveDraft.mutate({
                     body,
                     platforms: [...selected] as any,
                     aiGenerated: !!aiPrompt,
                     aiPrompt: aiPrompt || undefined,
                   })
                 }}
+                style={draftStatus === 'saved' ? { background: 'var(--s3)', color: 'var(--ok)' } : {}}
               >
-                Save draft
+                {saveDraft.isPending ? 'Saving...' : draftStatus === 'saved' ? '✓ Saved' : 'Save draft'}
               </button>
               <button className="btn-primary btn-sm"
-                disabled={!body.trim() || selected.size === 0 || createPost.isPending}
+                disabled={!body.trim() || selected.size === 0 || schedulePost.isPending || saveDraft.isPending}
                 onClick={() => {
                   if (!body.trim()) return
-                  createPost.mutate({
+                  schedulePost.mutate({
                     body,
                     platforms: [...selected] as any,
                     aiGenerated: !!aiPrompt,
                     aiPrompt: aiPrompt || undefined,
+                    scheduledAt: parseScheduledTime(scheduledTime),
                   })
                 }}
-                style={status === 'saved' ? { background: 'var(--ok)', color: '#071a0e' } : {}}
+                style={schedStatus === 'saved' ? { background: 'var(--ok)', color: '#071a0e' } : {}}
               >
-                {createPost.isPending ? 'Saving...' : status === 'saved' ? '✓ Scheduled' : 'Schedule'}
+                {schedulePost.isPending ? 'Scheduling...' : schedStatus === 'saved' ? '✓ Scheduled' : 'Schedule'}
               </button>
             </div>
           </div>
@@ -253,6 +307,42 @@ export default function SocialPage() {
           </div>
         </div>
       </div>
+
+      {/* Drafts / recent posts */}
+      {postsData && postsData.posts.length > 0 && (
+        <div style={S.bottom}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 20px', borderBottom: '1px solid var(--b0)' }}>
+            <span style={{ fontSize: '10.5px', fontWeight: 600, letterSpacing: '0.07em', textTransform: 'uppercase', color: 'var(--t3)' }}>
+              Recent drafts &amp; posts
+            </span>
+            <span style={{ fontSize: '11px', color: 'var(--t4)' }}>{postsData.posts.length} total</span>
+          </div>
+          <div style={{ display: 'flex', gap: '8px', padding: '8px 20px', overflowX: 'auto' }}>
+            {postsData.posts.slice(0, 6).map(p => {
+              const STATUS_COLORS: Record<string, string> = { draft: 'var(--t4)', scheduled: 'var(--v)', published: 'var(--ok)' }
+              return (
+                <div key={p.id} onClick={() => setBody(p.body)} style={{
+                  flexShrink: 0, width: '200px', padding: '10px 12px',
+                  background: 'var(--s2)', border: '1px solid var(--b1)', borderRadius: '8px',
+                  cursor: 'pointer', transition: 'border-color 120ms',
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '5px' }}>
+                    <span style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase', color: STATUS_COLORS[p.status] ?? 'var(--t4)' }}>
+                      {p.status}
+                    </span>
+                    <span style={{ fontSize: '10px', color: 'var(--t4)' }}>
+                      {new Date(p.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
+                    </span>
+                  </div>
+                  <p style={{ fontSize: '12px', color: 'var(--t2)', lineHeight: 1.5, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as any }}>
+                    {p.body}
+                  </p>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
