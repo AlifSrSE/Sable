@@ -165,7 +165,7 @@ model Organization {
 }
 
 model OrgMember {
-  id     String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id     String @id
   orgId  String @db.Uuid @map("org_id")
   userId String @db.Uuid @map("user_id")
   role   String @default("member")
