@@ -197,7 +197,7 @@ export default function AudioPage() {
             <p style={{ fontSize:'12.5px', color:'var(--t3)', marginBottom:'20px', lineHeight:1.6 }}>Paste an RSS feed URL or pick from the list below.</p>
             <div style={{ marginBottom:'18px' }}>
               <label style={{ display:'block', fontSize:'12px', fontWeight:500, color:'var(--t2)', marginBottom:'6px' }}>RSS feed URL</label>
-              <input type="text" value={feedUrl} onChange={e => setFeedUrl(e.target.value)} placeholder="https://feeds.simplecast.com/..." className="sable-input" />
+              <input type="text" value={feedUrl} onChange={e => setFeedUrl(e.target.value)} placeholder="e.g. https://feeds.buzzsprout.com/123.rss" className="sable-input" />
             </div>
             <div style={{ marginBottom:'24px' }}>
               <p style={{ fontSize:'10.5px', fontWeight:600, letterSpacing:'0.06em', textTransform:'uppercase', color:'var(--t3)', marginBottom:'10px' }}>Popular podcasts</p>
@@ -239,7 +239,7 @@ export default function AudioPage() {
                   }
                   subscribeMut.mutate({ feedUrl, title: PODCAST_NAMES[feedUrl] })
                 }}
-                style={subscribed ? { background: 'var(--ok)', color: '#071a0e' } : {}}
+                style={subscribed ? { background: 'var(--ok)', color: '#fff' } : {}}
               >
                 {subscribeMut.isPending ? 'Subscribing…' : subscribed ? '✓ Subscribed' : 'Subscribe'}
               </button>
