@@ -1,0 +1,5 @@
+// Barrel export — import UI primitives from '@/components/ui'
+export { SableMark }     from './SableMark'
+export { ThemeToggle }   from './ThemeToggle'
+export { ToastProvider, useToast } from './Toast'
+export { ErrorBoundary } from './ErrorBoundary'
