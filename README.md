@@ -61,8 +61,6 @@ Every pillar feeds the others. What you hear fuels what you publish. Your engage
 
 </div>
 
-> Add screenshots by dropping `.png` files into `docs/screenshots/`. The filenames map directly to the image tags above.
-
 ---
 
 ## Tech Stack
