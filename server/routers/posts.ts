@@ -30,6 +30,55 @@ export const postsRouter = router({
       return { posts, nextCursor }
     }),
 
+  // Get posts for a specific month (for calendar view)
+  byMonth: authedProc
+    .input(z.object({
+      year:  z.number().int().min(2020).max(2100),
+      month: z.number().int().min(1).max(12),
+    }))
+    .query(async ({ ctx, input }) => {
+      const start = new Date(input.year, input.month - 1, 1)
+      const end   = new Date(input.year, input.month, 1)
+
+      const [scheduled, drafts] = await Promise.all([
+        ctx.prisma.contentPost.findMany({
+          where: {
+            userId: ctx.userId,
+            scheduledAt: { gte: start, lt: end },
+          },
+          orderBy: { scheduledAt: 'asc' },
+        }),
+        ctx.prisma.contentPost.findMany({
+          where: {
+            userId: ctx.userId,
+            status: 'draft',
+          },
+          orderBy: { createdAt: 'desc' },
+          take: 10,
+        }),
+      ])
+
+      return { scheduled, drafts }
+    }),
+
+  // Platform breakdown for analytics
+  platformStats: authedProc
+    .query(async ({ ctx }) => {
+      const posts = await ctx.prisma.contentPost.findMany({
+        where: { userId: ctx.userId, status: 'published' },
+        select: { platforms: true },
+      })
+
+      const counts: Record<string, number> = {}
+      for (const post of posts) {
+        for (const p of post.platforms) {
+          counts[p] = (counts[p] ?? 0) + 1
+        }
+      }
+
+      return counts
+    }),
+
   // Get single post
   byId: authedProc
     .input(z.object({ id: z.string() }))
@@ -51,7 +100,6 @@ export const postsRouter = router({
       aiPrompt:    z.string().optional(),
     }))
     .mutation(async ({ ctx, input }) => {
-      // Check user exists
       const user = await ctx.prisma.user.findUnique({
         where: { id: ctx.userId },
       })
