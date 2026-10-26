@@ -1,9 +1,3 @@
-<div align="center">
-
-<img src="docs/screenshots/hero-banner.png" alt="Sable — What you learn becomes what you say" width="100%" />
-
-<br/>
-
 # sable
 
 **What you learn becomes what you say.**
