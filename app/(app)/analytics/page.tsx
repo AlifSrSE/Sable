@@ -1,8 +1,12 @@
 'use client'
 
 import Link from 'next/link'
+import { trpc } from '@/lib/trpc'
 
 export default function AnalyticsPage() {
+  const { data: postStats } = trpc.posts.stats.useQuery()
+  const { data: publishedPosts } = trpc.posts.list.useQuery({ status: 'published', limit: 10 })
+
   const heatmapData = [
     { time: '07:00 AM', vals: [1.2, 2.1, 3.4, 2.0, 1.1, 0.4, 0.5] },
     { time: '09:30 AM', vals: [3.2, 4.8, 6.8, 4.9, 2.8, 1.2, 1.4] },
@@ -39,12 +43,16 @@ export default function AnalyticsPage() {
   ]
   const maxH = 240
 
-  const dispatches = [
-    { title: 'The Death of SaaS Seat Pricing', sub: 'Monetization architectural teardown · 1,420 words', platform: 'LinkedIn', platColor: 'var(--v)', date: 'Oct 18, 2026', reach: '42.1k', eng: '7.8%', leads: 6 },
-    { title: 'The Architecture of Solitary Scale', sub: 'Operating $2M ARR with zero headcount', platform: 'Substack', platColor: 'var(--coral)', date: 'Oct 12, 2026', reach: '28.4k', eng: '5.9%', leads: 4 },
-    { title: '10 brutal truths about building in public', sub: 'Solo founder insights · Thread', platform: 'X', platColor: 'var(--v)', date: 'Oct 09, 2026', reach: '18.7k', eng: '9.2%', leads: 3 },
-    { title: 'Why Output-Based Billing Is Inevitable', sub: 'Enterprise GTM strategy · Long-form', platform: 'LinkedIn', platColor: 'var(--v)', date: 'Oct 03, 2026', reach: '14.3k', eng: '4.4%', leads: 1 },
-  ]
+  const dispatches = (publishedPosts?.posts ?? []).map(post => ({
+    title: post.body.slice(0, 60) + (post.body.length > 60 ? '…' : ''),
+    sub: post.platforms.join(' · '),
+    platform: post.platforms[0] ?? '—',
+    platColor: 'var(--v)',
+    date: post.scheduledAt ? new Date(post.scheduledAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—',
+    reach: '—',
+    eng: '—',
+    leads: 0,
+  }))
 
   const insightCards = [
     { color: 'var(--v)', label: 'Audience Gravity', body: 'LinkedIn drives 61% of your impressions but only 38% of inbound CRM leads — X thread posts are your highest lead-gen surface per impression unit.' },
@@ -133,7 +141,7 @@ export default function AnalyticsPage() {
             <span style={{ padding: '2px 8px', borderRadius: '99px', background: 'var(--teal-dim)', color: 'var(--teal)', fontSize: '10px', fontWeight: 600 }}>+4 MoM</span>
           </div>
           <div>
-            <div style={{ fontFamily: 'var(--serif)', fontSize: '2.1rem', color: 'var(--t1)', letterSpacing: '-0.04em', lineHeight: 1 }}>14 Contacts</div>
+            <div style={{ fontFamily: 'var(--serif)', fontSize: '2.1rem', color: 'var(--t1)', letterSpacing: '-0.04em', lineHeight: 1 }}>{postStats ? `${postStats.totalPosts} Posts` : "— Posts"}</div>
             <div style={{ fontSize: '11px', color: 'var(--t3)', marginTop: '4px' }}>5 Active deals initiated via content</div>
           </div>
           <Link href="/crm" style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', fontSize: '12px', color: 'var(--v)', textDecoration: 'none', fontWeight: 500 }}>
