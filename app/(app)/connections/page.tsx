@@ -1,5 +1,9 @@
 'use client'
 
+import { useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
+import { trpc } from '@/lib/trpc'
+
 interface Connection {
   id: string
   name: string
@@ -15,7 +19,7 @@ interface Connection {
   feedHealth?: string
   archiveDepth?: string
   apiTier?: string
-  actions: { label: string; variant: 'primary' | 'secondary' | 'danger' }[]
+  actions: { label: string; variant: 'primary' | 'secondary' | 'danger'; platformKey?: string }[]
   accentColor: string
 }
 
@@ -31,7 +35,7 @@ const primaryConnections: Connection[] = [
     scopes: 'Publish posts, Read analytics, Inbound notifications',
     lastSync: '12 minutes ago',
     tokenHealth: 100,
-    actions: [{ label: 'Configure Webhooks', variant: 'secondary' }, { label: 'Re-authenticate', variant: 'primary' }],
+    actions: [{ label: 'Configure Webhooks', variant: 'secondary' }, { label: 'Connect', variant: 'primary', platformKey: 'linkedin' }],
     accentColor: 'var(--teal)',
   },
   {
@@ -59,7 +63,7 @@ const primaryConnections: Connection[] = [
     scopes: 'Draft staging, automated essay cross-publishing, subscriber tier mapping',
     feedHealth: 'Optimal (0ms jitter)',
     archiveDepth: '114 Editions',
-    actions: [{ label: 'Publication Settings', variant: 'secondary' }, { label: 'Sync Archives', variant: 'primary' }],
+    actions: [{ label: 'Publication Settings', variant: 'secondary' }, { label: 'Connect', variant: 'primary', platformKey: 'twitter' }],
     accentColor: 'var(--coral)',
   },
 ]
@@ -87,6 +91,39 @@ const statusBadge = (status: string, label: string) => {
 }
 
 export default function ConnectionsPage() {
+  const { data } = trpc.socialAccounts.list.useQuery()
+  const disconnectMut = trpc.socialAccounts.disconnect.useMutation({
+    onSuccess: () => { refetch() },
+  })
+  const { refetch } = trpc.socialAccounts.list.useQuery()
+  const searchParams = useSearchParams()
+
+  useEffect(() => {
+    const connected = searchParams.get('connected')
+    const error     = searchParams.get('error')
+    if (connected || error) {
+      // Strip query string without reload
+      window.history.replaceState({}, '', '/connections')
+    }
+  }, [searchParams])
+
+  const connectedPlatforms = new Set<string>((data?.accounts ?? []).map(a => a.platform as string))
+
+  function connectUrl(platform: 'linkedin' | 'twitter') {
+    return `/api/auth/${platform}`
+  }
+
+  function handleConnect(platform: string) {
+    if (platform === 'linkedin' || platform === 'twitter') {
+      window.location.href = connectUrl(platform)
+    }
+  }
+
+  function handleDisconnect(platform: string) {
+    const account = data?.accounts.find(a => (a.platform as string) === platform)
+    if (account) disconnectMut.mutate({ id: account.id })
+  }
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', position: 'relative' }}>
       {/* Ambient glow */}
@@ -234,19 +271,33 @@ export default function ConnectionsPage() {
               {/* Actions */}
               <div style={{ display: 'flex', gap: '0.5rem', borderTop: '1px solid var(--b1)', paddingTop: '0.875rem' }}>
                 {conn.actions.map(action => (
-                  <button key={action.label} style={{
-                    flex: action.variant === 'secondary' ? 1 : 'none',
-                    padding: '0.375rem 0.75rem',
-                    borderRadius: '0.375rem',
-                    border: '1px solid var(--b2)',
-                    background: 'transparent',
-                    color: action.variant === 'danger' ? 'var(--err)' : action.variant === 'primary' ? 'var(--v)' : 'var(--t2)',
-                    fontSize: '12px',
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                    fontFamily: 'var(--sans)',
-                    textAlign: 'center' as const,
-                  }}>{action.label}</button>
+                  <button key={action.label}
+                    onClick={() => {
+                      if (action.platformKey) {
+                        if (connectedPlatforms.has(action.platformKey)) {
+                          handleDisconnect(action.platformKey)
+                        } else {
+                          handleConnect(action.platformKey)
+                        }
+                      }
+                    }}
+                    style={{
+                      flex: action.variant === 'secondary' ? 1 : 'none',
+                      padding: '0.375rem 0.75rem',
+                      borderRadius: '0.375rem',
+                      border: '1px solid var(--b2)',
+                      background: 'transparent',
+                      color: action.variant === 'danger' ? 'var(--err)' : action.variant === 'primary' ? 'var(--v)' : 'var(--t2)',
+                      fontSize: '12px',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      fontFamily: 'var(--sans)',
+                      textAlign: 'center' as const,
+                    }}>
+                      {action.platformKey
+                        ? (connectedPlatforms.has(action.platformKey) ? 'Re-authenticate' : action.label)
+                        : action.label}
+                    </button>
                 ))}
               </div>
             </div>
