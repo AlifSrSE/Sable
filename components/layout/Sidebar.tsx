@@ -113,7 +113,7 @@ export function Sidebar() {
       </nav>
 
       <div style={{ borderTop: '1px solid var(--b1)', padding: '12px 14px', display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
-        <UserButton afterSignOutUrl="/" />
+        <UserButton />
         <div style={{ flex: 1, minWidth: 0 }}>
           <p style={{ fontSize: '12.5px', fontWeight: 500, color: 'var(--t1)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{displayName}</p>
           <p style={{ fontSize: '11px', color: 'var(--t3)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.primaryEmailAddress?.emailAddress ?? ''}</p>
