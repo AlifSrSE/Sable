@@ -178,6 +178,68 @@ export const contactsRouter = router({
       })
     }),
 
+  // Import contacts from CSV
+  importCsv: authedProc
+    .input(z.object({
+      // Raw CSV text — columns: name, email, company, role, linkedin, notes
+      csv: z.string().min(1).max(500_000),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const lines = input.csv.split(/\r?\n/).filter(Boolean)
+      if (lines.length < 2) throw new TRPCError({ code: 'BAD_REQUEST', message: 'CSV must have a header row and at least one data row' })
+
+      // Parse header — normalise column names
+      const header = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/[^a-z0-9]/g, '_'))
+
+      const col = (row: string[], key: string): string => {
+        const idx = header.indexOf(key)
+        return idx >= 0 ? (row[idx] ?? '').trim() : ''
+      }
+
+      const rows = lines.slice(1).map(line => {
+        // Handle quoted fields
+        const cells: string[] = []
+        let cur = '', inQuote = false
+        for (const ch of line + ',') {
+          if (ch === '"') { inQuote = !inQuote }
+          else if (ch === ',' && !inQuote) { cells.push(cur.trim()); cur = '' }
+          else { cur += ch }
+        }
+        return cells
+      })
+
+      let created = 0, updated = 0, skipped = 0
+
+      for (const row of rows) {
+        const name = col(row, 'name') || col(row, 'full_name') || col(row, 'first_name')
+        if (!name) { skipped++; continue }
+
+        const data = {
+          name,
+          email:     col(row, 'email') || null,
+          company:   col(row, 'company') || col(row, 'organization') || null,
+          role:      col(row, 'role') || col(row, 'title') || col(row, 'job_title') || null,
+          linkedin:  col(row, 'linkedin') || col(row, 'linkedin_url') || null,
+          notes:     col(row, 'notes') || null,
+        }
+
+        // Upsert by email if present, otherwise by name+userId
+        const existing = data.email
+          ? await ctx.prisma.contact.findFirst({ where: { userId: ctx.userId, email: data.email, deletedAt: null } })
+          : await ctx.prisma.contact.findFirst({ where: { userId: ctx.userId, name: data.name, deletedAt: null } })
+
+        if (existing) {
+          await ctx.prisma.contact.update({ where: { id: existing.id }, data })
+          updated++
+        } else {
+          await ctx.prisma.contact.create({ data: { userId: ctx.userId, ...data } })
+          created++
+        }
+      }
+
+      return { created, updated, skipped, total: rows.length }
+    }),
+
   // Stats
   stats: authedProc
     .query(async ({ ctx }) => {
