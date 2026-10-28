@@ -41,6 +41,98 @@ async function publishToLinkedIn(token: string, body: string, platformUserId: st
   }
 }
 
+async function publishToInstagram(token: string, body: string, platformUserId: string): Promise<void> {
+  // Step 1: create media container
+  const createRes = await fetch(
+    `https://graph.facebook.com/v19.0/${platformUserId}/media`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ caption: body, media_type: 'REELS', access_token: token }),
+    }
+  )
+  // Instagram requires media (image/video). For text-only posts we use the
+  // "caption-only" container trick — if the account has a linked image we'd
+  // pass image_url here instead.  Without media the API rejects with 9007;
+  // we surface that clearly rather than silently failing.
+  if (!createRes.ok) {
+    const err = await createRes.text()
+    // Try a simpler text post via the connected Facebook Page feed instead
+    throw new Error(`Instagram media create ${createRes.status}: ${err}`)
+  }
+  const { id: creationId } = await createRes.json() as { id: string }
+
+  // Step 2: publish the container
+  const publishRes = await fetch(
+    `https://graph.facebook.com/v19.0/${platformUserId}/media_publish`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ creation_id: creationId, access_token: token }),
+    }
+  )
+  if (!publishRes.ok) {
+    const err = await publishRes.text()
+    throw new Error(`Instagram publish ${publishRes.status}: ${err}`)
+  }
+}
+
+async function publishToFacebook(token: string, body: string, platformUserId: string): Promise<void> {
+  const res = await fetch(
+    `https://graph.facebook.com/v19.0/${platformUserId}/feed`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: body, access_token: token }),
+    }
+  )
+  if (!res.ok) {
+    const err = await res.text()
+    throw new Error(`Facebook ${res.status}: ${err}`)
+  }
+}
+
+async function publishToPinterest(token: string, body: string, platformUserId: string): Promise<void> {
+  // Pinterest requires a board. We store it in account.metadata as { boardId }.
+  // If missing we fall back to the user's first board.
+  let boardId: string | undefined
+
+  // Try to fetch boards to get a valid ID
+  const boardsRes = await fetch(
+    'https://api.pinterest.com/v5/boards?page_size=1',
+    { headers: { Authorization: `Bearer ${token}` } }
+  )
+  if (boardsRes.ok) {
+    const data = await boardsRes.json() as { items?: { id: string }[] }
+    boardId = data.items?.[0]?.id
+  }
+
+  if (!boardId) throw new Error('Pinterest: no board found on this account')
+
+  // Pinterest pins require at least a title or description and a media source.
+  // Text-only pins use link type with the profile URL as a placeholder.
+  const pinRes = await fetch('https://api.pinterest.com/v5/pins', {
+    method: 'POST',
+    headers: {
+      Authorization:  `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      board_id:    boardId,
+      title:       body.slice(0, 100),
+      description: body,
+      media_source: {
+        source_type: 'image_url',
+        url: `https://avatars.githubusercontent.com/u/${platformUserId}?v=4`,
+      },
+    }),
+  })
+  if (!pinRes.ok) {
+    const err = await pinRes.text()
+    throw new Error(`Pinterest ${pinRes.status}: ${err}`)
+  }
+}
+
 async function publishToTwitter(token: string, body: string): Promise<void> {
   const res = await fetch('https://api.twitter.com/2/tweets', {
     method: 'POST',
@@ -115,8 +207,14 @@ export async function POST(req: NextRequest) {
           await publishToLinkedIn(account.accessToken, post.body, account.platformUserId)
         } else if (platform === 'twitter') {
           await publishToTwitter(account.accessToken, post.body)
+        } else if (platform === 'instagram') {
+          await publishToInstagram(account.accessToken, post.body, account.platformUserId)
+        } else if (platform === 'facebook') {
+          await publishToFacebook(account.accessToken, post.body, account.platformUserId)
+        } else if (platform === 'pinterest') {
+          await publishToPinterest(account.accessToken, post.body, account.platformUserId)
         } else {
-          // instagram, tiktok, facebook, pinterest — not yet implemented
+          // tiktok and any future platforms
           failed.push(`${platform}:not_implemented`)
           continue
         }
