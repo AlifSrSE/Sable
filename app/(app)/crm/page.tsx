@@ -184,6 +184,8 @@ export default function CRMPage() {
   const [showLog,       setShowLog]       = useState(false)
   const [showEdit,      setShowEdit]      = useState(false)
   const [confirmDelete, setConfirmDelete] = useState<{id:string; name:string}|null>(null)
+  const [showImport,    setShowImport]    = useState(false)
+  const [importResult,  setImportResult]  = useState<{created:number;updated:number;skipped:number;total:number}|null>(null)
 
   const { data: listData, isLoading, refetch } = trpc.contacts.list.useQuery({ search, limit: 50 })
   const { data: stats }     = trpc.contacts.stats.useQuery()
@@ -195,6 +197,20 @@ export default function CRMPage() {
   const deleteContact = trpc.contacts.delete.useMutation({
     onSuccess: () => { setSelected(null); refetch() },
   })
+
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const importCsv = trpc.contacts.importCsv.useMutation({
+    onSuccess: (res) => { setImportResult(res); refetch() },
+  })
+
+  function handleFileUpload(file: File) {
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      const csv = e.target?.result as string
+      if (csv) importCsv.mutate({ csv })
+    }
+    reader.readAsText(file)
+  }
 
   const contacts = listData?.contacts ?? []
 
@@ -213,10 +229,16 @@ export default function CRMPage() {
             {stats ? `${stats.total} contacts · ${stats.needsAttention} need attention` : 'Loading...'}
           </p>
         </div>
-        <button className="btn-primary" onClick={() => setShowAdd(true)}>
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Add contact
-        </button>
+        <div style={{ display:'flex', gap:'8px' }}>
+          <button className="btn-secondary" onClick={() => setShowImport(true)}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Import CSV
+          </button>
+          <button className="btn-primary" onClick={() => setShowAdd(true)}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add contact
+          </button>
+        </div>
       </div>
 
       <div style={{ flex:1, display:'grid', gridTemplateColumns:'1fr 320px', overflow:'hidden' }}>
@@ -423,6 +445,58 @@ export default function CRMPage() {
         </div>
       </div>
 
+      {showImport && (
+        <div className="modal-overlay" onClick={e => e.target === e.currentTarget && setShowImport(false)}>
+          <div className="modal-box" style={{ width:'440px' }}>
+            <h2 style={{ fontFamily:'var(--serif)', fontSize:'1.4rem', color:'var(--t1)', letterSpacing:'-0.03em', marginBottom:'6px' }}>Import contacts</h2>
+            <p style={{ fontSize:'12.5px', color:'var(--t3)', marginBottom:'20px', lineHeight:1.6 }}>
+              Upload a CSV with columns: <code style={{ background:'var(--s3)', padding:'1px 5px', borderRadius:'4px', fontSize:'11.5px' }}>name, email, company, role, linkedin, notes</code>. Existing contacts are updated by email.
+            </p>
+            {importResult ? (
+              <div style={{ padding:'16px', borderRadius:'10px', background:'var(--s2)', border:'1px solid var(--b1)', marginBottom:'20px', textAlign:'center' }}>
+                <div style={{ fontSize:'13px', fontWeight:600, color:'var(--ok)', marginBottom:'8px' }}>✓ Import complete</div>
+                <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:'8px' }}>
+                  {[
+                    { label:'Created', val: importResult.created, color:'var(--ok)' },
+                    { label:'Updated', val: importResult.updated, color:'var(--v)' },
+                    { label:'Skipped', val: importResult.skipped, color:'var(--t3)' },
+                  ].map(s => (
+                    <div key={s.label} style={{ background:'var(--bg)', borderRadius:'8px', padding:'10px' }}>
+                      <div style={{ fontSize:'1.4rem', fontFamily:'var(--serif)', color:s.color }}>{s.val}</div>
+                      <div style={{ fontSize:'11px', color:'var(--t3)' }}>{s.label}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div
+                onDragOver={e => e.preventDefault()}
+                onDrop={e => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f) handleFileUpload(f) }}
+                style={{ border:'2px dashed var(--b2)', borderRadius:'10px', padding:'32px', textAlign:'center', marginBottom:'20px', cursor:'pointer', transition:'border-color 150ms' }}
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" strokeWidth="1.2" style={{ marginBottom:'10px' }}>
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+                </svg>
+                <p style={{ fontSize:'13px', color:'var(--t2)', marginBottom:'4px' }}>
+                  {importCsv.isPending ? 'Importing…' : 'Drop CSV file here or click to browse'}
+                </p>
+                <p style={{ fontSize:'11.5px', color:'var(--t3)' }}>Supports .csv files up to 500KB</p>
+                <input ref={fileInputRef} type="file" accept=".csv,text/csv" style={{ display:'none' }}
+                  onChange={e => { const f = e.target.files?.[0]; if (f) handleFileUpload(f) }} />
+              </div>
+            )}
+            {importCsv.error && (
+              <p style={{ fontSize:'12px', color:'var(--err)', marginBottom:'10px' }}>{importCsv.error.message}</p>
+            )}
+            <div style={{ display:'flex', gap:'8px', justifyContent:'flex-end' }}>
+              <button className="btn-secondary" onClick={() => { setShowImport(false); setImportResult(null); importCsv.reset() }}>
+                {importResult ? 'Done' : 'Cancel'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {showAdd && <AddModal onClose={() => setShowAdd(false)} onSuccess={() => refetch()} />}
       {showEdit && contact && <EditModal contact={contact} onClose={() => setShowEdit(false)} onSuccess={() => { refetch(); refetchContact() }} />}
       {showLog && contact && <LogModal contactId={contact.id} contactName={contact.name} onClose={() => setShowLog(false)} onSuccess={() => refetchContact()} />}
