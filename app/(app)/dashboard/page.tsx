@@ -15,7 +15,15 @@ export default async function DashboardPage() {
   const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening'
   const dayLabel = now.toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long' })
 
-  const [totalPosts, scheduledPosts, publishedPosts, totalContacts, needsAttention, upcomingPosts, staleContacts] = await Promise.all([
+  // Build week boundaries for this Mon–Sun
+  const dow = now.getDay() === 0 ? 7 : now.getDay()
+  const thisMonday = new Date(now)
+  thisMonday.setDate(now.getDate() - dow + 1)
+  thisMonday.setHours(0, 0, 0, 0)
+  const nextMonday = new Date(thisMonday)
+  nextMonday.setDate(thisMonday.getDate() + 7)
+
+  const [totalPosts, scheduledPosts, publishedPosts, totalContacts, needsAttention, upcomingPosts, staleContacts, weekPostsRaw] = await Promise.all([
     prisma.contentPost.count({ where: { userId } }),
     prisma.contentPost.count({ where: { userId, status: 'scheduled' } }),
     prisma.contentPost.count({ where: { userId, status: 'published' } }),
@@ -45,6 +53,10 @@ export default async function DashboardPage() {
       orderBy: { lastContactedAt: 'asc' },
       take: 3,
     }),
+    prisma.contentPost.findMany({
+      where: { userId, scheduledAt: { gte: thisMonday, lt: nextMonday } },
+      select: { scheduledAt: true },
+    }),
   ])
 
   const voiceProfilePct = Math.min(100, Math.round((Math.min(totalPosts, 50) / 50) * 100))
@@ -72,15 +84,23 @@ export default async function DashboardPage() {
     { label: 'CRM Network', val: String(totalContacts), badge: needsAttention > 0 ? `${needsAttention} stale` : 'All fresh', bclr: 'var(--coral)', bars: [50,40,60,45,75,85] },
   ]
 
-  const weekDays = [
-    { day: 'MON', pct: 65, posts: '2 posts', isToday: false },
-    { day: 'TUE', pct: 85, posts: '3 posts', isToday: false },
-    { day: 'WED', pct: 100, posts: '4 posts', isToday: false, hi: true },
-    { day: 'THU', pct: 40, posts: '1 post', isToday: false },
-    { day: 'FRI', pct: 75, posts: '2 posts', isToday: false },
-    { day: 'SAT', pct: 15, posts: 'Rest', isToday: false, dim: true },
-    { day: 'SUN', pct: 60, posts: 'Today', isToday: true },
-  ]
+  const DAY_LABELS = ['MON','TUE','WED','THU','FRI','SAT','SUN']
+  const todayDowIdx = now.getDay() === 0 ? 6 : now.getDay() - 1
+  const dayCounts = DAY_LABELS.map((_, i) =>
+    weekPostsRaw.filter(p => {
+      if (!p.scheduledAt) return false
+      const d = p.scheduledAt.getDay()
+      return (d === 0 ? 6 : d - 1) === i
+    }).length
+  )
+  const maxDayCount = Math.max(1, ...dayCounts)
+  const weekDays = DAY_LABELS.map((day, i) => ({
+    day,
+    pct: dayCounts[i] === 0 ? 8 : Math.round((dayCounts[i] / maxDayCount) * 100),
+    posts: dayCounts[i] === 0 ? '—' : `${dayCounts[i]} post${dayCounts[i] !== 1 ? 's' : ''}`,
+    isToday: i === todayDowIdx,
+    hi: dayCounts[i] === maxDayCount && dayCounts[i] > 0,
+  }))
 
   const trends = [
     { velocity: '+340% velocity', cat: 'B2B Systems', title: 'Autonomous Agent Orchestration & Multi-modal UX Failures', body: 'Engineers are debating synchronous vs asynchronous human-in-the-loop validation patterns.' },
@@ -276,10 +296,10 @@ export default async function DashboardPage() {
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', gap: '8px' }}>
               {weekDays.map((d) => (
-                <div key={d.day} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', padding: '10px 8px', borderRadius: '10px', background: d.isToday ? 'var(--s3)' : 'var(--s2)', border: d.isToday ? '1px solid var(--vm)' : '1px solid var(--b0)', opacity: d.dim ? 0.5 : 1 }}>
+                <div key={d.day} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', padding: '10px 8px', borderRadius: '10px', background: d.isToday ? 'var(--s3)' : 'var(--s2)', border: d.isToday ? '1px solid var(--vm)' : '1px solid var(--b0)', opacity: 1 }}>
                   <span style={{ fontSize: '10px', fontWeight: 700, color: d.isToday ? 'var(--v)' : 'var(--t3)', letterSpacing: '0.04em' }}>{d.day}</span>
                   <div style={{ width: '100%', background: 'var(--bg)', height: '80px', borderRadius: '6px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', padding: '3px' }}>
-                    <div style={{ width: '100%', height: `${d.pct}%`, borderRadius: '4px', background: d.isToday || d.hi ? 'var(--v)' : d.dim ? 'var(--t4)' : 'color-mix(in srgb, var(--teal) 55%, transparent)', transition: 'height 300ms ease' }} />
+                    <div style={{ width: '100%', height: `${d.pct}%`, borderRadius: '4px', background: d.isToday || d.hi ? 'var(--v)' : 'color-mix(in srgb, var(--teal) 55%, transparent)', transition: 'height 300ms ease' }} />
                   </div>
                   <span style={{ fontSize: '11px', fontWeight: d.isToday || d.hi ? 600 : 400, color: d.isToday || d.hi ? 'var(--v)' : 'var(--t2)', textAlign: 'center' as const, lineHeight: 1.2 }}>{d.posts}</span>
                 </div>
