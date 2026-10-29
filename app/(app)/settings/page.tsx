@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
+import { trpc } from '@/lib/trpc'
 
 type Tab = 'profile' | 'ai' | 'appearance' | 'notifications' | 'security' | 'danger'
 
@@ -13,8 +14,10 @@ const tabs: { id: Tab; label: string; badge?: string }[] = [
   { id: 'danger', label: 'Danger Zone' },
 ]
 
-function Slider({ label, desc, value, min = 0, max = 100, leftLabel, midLabel, rightLabel, color = 'var(--v)', badgeLabel, badgeColor = 'var(--v)' }: { label: string; desc: string; value: number; min?: number; max?: number; leftLabel: string; midLabel: string; rightLabel: string; color?: string; badgeLabel: string; badgeColor?: string }) {
+function Slider({ label, desc, value, min = 0, max = 100, leftLabel, midLabel, rightLabel, color = 'var(--v)', badgeLabel, badgeColor = 'var(--v)', onChange }: { label: string; desc: string; value: number; min?: number; max?: number; leftLabel: string; midLabel: string; rightLabel: string; color?: string; badgeLabel: string; badgeColor?: string; onChange?: (v: number) => void }) {
   const [val, setVal] = useState(value)
+  // sync when parent value changes (on data load)
+  if (val !== value && onChange === undefined) setVal(value)
   return (
     <div style={{ padding: '1rem', borderRadius: '0.75rem', background: 'var(--s2)', display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
@@ -24,7 +27,8 @@ function Slider({ label, desc, value, min = 0, max = 100, leftLabel, midLabel, r
         </div>
         <span style={{ fontSize: '12px', fontWeight: 600, padding: '0.25rem 0.625rem', borderRadius: '0.375rem', background: `color-mix(in srgb, ${badgeColor} 12%, transparent)`, color: badgeColor }}>{badgeLabel}</span>
       </div>
-      <input type="range" min={min} max={max} value={val} onChange={e => setVal(Number(e.target.value))}
+      <input type="range" min={min} max={max} value={val}
+        onChange={e => { const v = Number(e.target.value); setVal(v); onChange?.(v) }}
         style={{ width: '100%', height: 6, borderRadius: 3, appearance: 'none', background: `linear-gradient(to right, ${color} ${val}%, var(--s3) ${val}%)`, cursor: 'pointer', outline: 'none' }}
       />
       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: 'var(--t3)' }}>
@@ -55,6 +59,42 @@ function Toggle({ label, desc, checked: defaultChecked = true }: { label: string
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState<Tab>('profile')
+  const [saved, setSaved] = useState(false)
+
+  // Profile
+  const { data: me } = trpc.users.me.useQuery()
+  const updateProfile = trpc.users.updateProfile.useMutation({
+    onSuccess: () => { setSaved(true); setTimeout(() => setSaved(false), 2000) },
+  })
+  const updateVoice = trpc.users.updateVoice.useMutation({
+    onSuccess: () => { setSaved(true); setTimeout(() => setSaved(false), 2000) },
+  })
+
+  const nameRef     = useRef<HTMLInputElement>(null)
+  const handleRef   = useRef<HTMLInputElement>(null)
+  const bioRef      = useRef<HTMLTextAreaElement>(null)
+  const tzRef       = useRef<HTMLSelectElement>(null)
+
+  // AI calibration slider values
+  const voiceCal = (me?.voiceProfile as Record<string,Record<string,number>> | null)?.calibration ?? {}
+  const [tone,         setTone]         = useState<number>(voiceCal.tone         ?? 65)
+  const [density,      setDensity]      = useState<number>(voiceCal.density      ?? 40)
+  const [controversy,  setControversy]  = useState<number>(voiceCal.controversy  ?? 30)
+  const [storytelling, setStorytelling] = useState<number>(voiceCal.storytelling ?? 70)
+  const [dataDepth,    setDataDepth]    = useState<number>(voiceCal.dataDepth    ?? 55)
+
+  function handleSave() {
+    if (activeTab === 'profile') {
+      updateProfile.mutate({
+        name:     nameRef.current?.value,
+        handle:   handleRef.current?.value,
+        bio:      bioRef.current?.value,
+        timezone: tzRef.current?.value,
+      })
+    } else if (activeTab === 'ai') {
+      updateVoice.mutate({ tone, density, controversy, storytelling, dataDepth })
+    }
+  }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
@@ -70,9 +110,9 @@ export default function SettingsPage() {
           <p style={{ margin: '0.25rem 0 0', fontSize: '14px', color: 'var(--t2)' }}>Manage your profile, AI voice calibration, notification thresholds, and account security.</p>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <button style={{ height: 36, padding: '0 1rem', borderRadius: '0.5rem', border: '1px solid var(--b2)', background: 'transparent', color: 'var(--t2)', fontSize: '14px', fontWeight: 600, cursor: 'pointer', fontFamily: 'var(--sans)' }}>Discard Changes</button>
-          <button style={{ height: 36, padding: '0 1.25rem', borderRadius: '0.5rem', border: 'none', background: 'var(--v)', color: 'var(--btn-primary-text)', fontSize: '14px', fontWeight: 600, cursor: 'pointer', fontFamily: 'var(--sans)', display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
-            ✓ Save Changes
+          <button onClick={() => { if(nameRef.current) nameRef.current.blur() }} style={{ height: 36, padding: '0 1rem', borderRadius: '0.5rem', border: '1px solid var(--b2)', background: 'transparent', color: 'var(--t2)', fontSize: '14px', fontWeight: 600, cursor: 'pointer', fontFamily: 'var(--sans)' }}>Discard Changes</button>
+          <button onClick={handleSave} disabled={updateProfile.isPending || updateVoice.isPending} style={{ height: 36, padding: '0 1.25rem', borderRadius: '0.5rem', border: 'none', background: saved ? 'var(--ok)' : 'var(--v)', color: 'var(--btn-primary-text)', fontSize: '14px', fontWeight: 600, cursor: 'pointer', fontFamily: 'var(--sans)', display: 'flex', alignItems: 'center', gap: '0.375rem', transition: 'background 200ms' }}>
+            {saved ? '✓ Saved!' : updateProfile.isPending || updateVoice.isPending ? 'Saving…' : '✓ Save Changes'}
           </button>
         </div>
       </div>
@@ -140,45 +180,47 @@ export default function SettingsPage() {
               </div>
               {/* Form grid */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                {[
-                  { label: 'First Name', value: 'Alif', type: 'text' },
-                  { label: 'Last Name', value: 'Rahman', type: 'text' },
-                  { label: 'Public Handle', value: 'alifsrse', type: 'text', prefix: '@' },
-                  { label: 'Primary Email', value: 'alif.rahman.c@gmail.com', type: 'email', readonly: true, badge: 'Verified' },
-                ].map(f => (
-                  <div key={f.label} style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <label style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', color: 'var(--t3)' }}>{f.label}</label>
-                      {f.badge && <span style={{ fontSize: '11px', fontWeight: 600, padding: '0.125rem 0.375rem', borderRadius: '9999px', background: 'color-mix(in srgb, var(--teal) 12%, transparent)', color: 'var(--teal)' }}>✓ {f.badge}</span>}
-                    </div>
-                    <div style={{ position: 'relative' }}>
-                      {f.prefix && <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--t3)', fontSize: '13px' }}>{f.prefix}</span>}
-                      <input
-                        type={f.type} defaultValue={f.value} readOnly={f.readonly}
-                        style={{ width: '100%', height: 40, padding: f.prefix ? '0 0.875rem 0 1.75rem' : '0 0.875rem', borderRadius: '0.5rem', border: '1px solid var(--b2)', background: f.readonly ? 'var(--s1)' : 'var(--s1)', color: f.readonly ? 'var(--t3)' : 'var(--t1)', fontSize: '14px', fontFamily: 'var(--sans)', outline: 'none', boxSizing: 'border-box' as const, cursor: f.readonly ? 'not-allowed' : 'text' }}
-                      />
-                    </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+                  <label style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase' as const, color: 'var(--t3)' }}>Full Name</label>
+                  <input ref={nameRef} type="text" defaultValue={me?.name ?? ''} placeholder="Your name"
+                    className="sable-input" style={{ height: 40 }} />
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+                  <label style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase' as const, color: 'var(--t3)' }}>Public Handle</label>
+                  <div style={{ position: 'relative' }}>
+                    <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--t3)', fontSize: '13px' }}>@</span>
+                    <input ref={handleRef} type="text" defaultValue={me?.niche ?? ''} placeholder="yourhandle"
+                      className="sable-input" style={{ height: 40, paddingLeft: '1.75rem' }} />
                   </div>
-                ))}
-                <div style={{ gridColumn: '1 / -1', display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <label style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', color: 'var(--t3)' }}>Editorial Bio & Stance</label>
-                    <span style={{ fontSize: '11px', color: 'var(--t3)' }}>98 / 180 chars</span>
+                    <label style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase' as const, color: 'var(--t3)' }}>Primary Email</label>
+                    <span style={{ fontSize: '11px', fontWeight: 600, padding: '0.125rem 0.375rem', borderRadius: '9999px', background: 'color-mix(in srgb, var(--teal) 12%, transparent)', color: 'var(--teal)' }}>✓ Verified</span>
                   </div>
-                  <textarea defaultValue="Founder @ Sable. Designing autonomous creative engines and editorial intelligence suites for solitary operators." rows={3}
-                    style={{ width: '100%', padding: '0.75rem 0.875rem', borderRadius: '0.5rem', border: '1px solid var(--b2)', background: 'var(--s1)', color: 'var(--t1)', fontSize: '14px', fontFamily: 'var(--sans)', resize: 'none', outline: 'none', lineHeight: '1.6', boxSizing: 'border-box' as const }}
-                  />
+                  <input type="email" value={me?.email ?? ''} readOnly
+                    className="sable-input" style={{ height: 40, color: 'var(--t3)', cursor: 'not-allowed' }} />
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+                  <label style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase' as const, color: 'var(--t3)' }}>Editorial Scheduling Time Zone</label>
+                  <select ref={tzRef} defaultValue={me?.timezone ?? 'UTC'}
+                    style={{ width: '100%', height: 40, padding: '0 0.875rem', borderRadius: '0.5rem', border: '1px solid var(--b2)', background: 'var(--s1)', color: 'var(--t1)', fontSize: '14px', fontFamily: 'var(--sans)', outline: 'none', cursor: 'pointer' }}>
+                    <option value="America/Los_Angeles">Pacific Time (US & Canada) — GMT-7</option>
+                    <option value="America/New_York">Eastern Time (US & Canada) — GMT-4</option>
+                    <option value="UTC">Greenwich Mean Time (London) — GMT+0</option>
+                    <option value="Europe/Berlin">Central European Time (Berlin) — GMT+1</option>
+                    <option value="Asia/Singapore">Singapore Standard Time — GMT+8</option>
+                    <option value="Asia/Tokyo">Japan Standard Time (Tokyo) — GMT+9</option>
+                  </select>
                 </div>
                 <div style={{ gridColumn: '1 / -1', display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
-                  <label style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', color: 'var(--t3)' }}>Editorial Scheduling Time Zone</label>
-                  <select defaultValue="pacific" style={{ width: '100%', height: 40, padding: '0 0.875rem', borderRadius: '0.5rem', border: '1px solid var(--b2)', background: 'var(--s1)', color: 'var(--t1)', fontSize: '14px', fontFamily: 'var(--sans)', outline: 'none', cursor: 'pointer' }}>
-                    <option value="pacific">Pacific Time (US & Canada) — GMT-7</option>
-                    <option value="eastern">Eastern Time (US & Canada) — GMT-4</option>
-                    <option value="gmt">Greenwich Mean Time (London) — GMT+0</option>
-                    <option value="cet">Central European Time (Berlin) — GMT+1</option>
-                    <option value="sgt">Singapore Standard Time — GMT+8</option>
-                    <option value="jst">Japan Standard Time (Tokyo) — GMT+9</option>
-                  </select>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <label style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase' as const, color: 'var(--t3)' }}>Editorial Bio & Stance</label>
+                  </div>
+                  <textarea ref={bioRef} defaultValue={((me?.voiceProfile as Record<string,string> | null)?.bio) ?? ''}
+                    rows={3} placeholder="Founder @ Sable. Designing autonomous creative engines..."
+                    style={{ width: '100%', padding: '0.75rem 0.875rem', borderRadius: '0.5rem', border: '1px solid var(--b2)', background: 'var(--s1)', color: 'var(--t1)', fontSize: '14px', fontFamily: 'var(--sans)', resize: 'none', outline: 'none', lineHeight: '1.6', boxSizing: 'border-box' as const }}
+                  />
                 </div>
               </div>
             </section>
@@ -217,11 +259,28 @@ export default function SettingsPage() {
                   <span style={{ fontSize: '11px', color: 'var(--t3)' }}>Target: 22 Ingested Items</span>
                 </div>
               </div>
-              {/* Sliders */}
+              {/* Sliders — wired to state, saved via Save Changes button */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                <Slider label="Tone Density" desc="Vocabulary compression and syntactic layering" value={78} leftLabel="Conversational · 0%" midLabel="Balanced · 50%" rightLabel="Academic Rigor · 100%" badgeLabel="High Density (Academic)" color="var(--v)" badgeColor="var(--v)" />
-                <Slider label="Voice Stance" desc="Assertiveness, hedging, and contrarian framing" value={84} leftLabel="Diplomatic / Nuanced" midLabel="Pragmatic Observer" rightLabel="Radically Direct" badgeLabel="Opinionated & Direct" color="var(--teal)" badgeColor="var(--teal)" />
-                <Slider label="Metaphor Level" desc="Use of literary analogies vs operational literalism" value={38} leftLabel="Literal · 0%" midLabel="Subtle · 50%" rightLabel="High Metaphor · 100%" badgeLabel="Subtle & Tactical" color="var(--coral)" badgeColor="var(--coral)" />
+                <Slider label="Tone Density" desc="Vocabulary compression and syntactic layering"
+                  value={tone} onChange={setTone}
+                  leftLabel="Conversational · 0%" midLabel="Balanced · 50%" rightLabel="Academic Rigor · 100%"
+                  badgeLabel={tone >= 70 ? 'High Density (Academic)' : tone >= 40 ? 'Balanced' : 'Conversational'}
+                  color="var(--v)" badgeColor="var(--v)" />
+                <Slider label="Voice Stance" desc="Assertiveness, hedging, and contrarian framing"
+                  value={controversy} onChange={setControversy}
+                  leftLabel="Diplomatic / Nuanced" midLabel="Pragmatic Observer" rightLabel="Radically Direct"
+                  badgeLabel={controversy >= 70 ? 'Opinionated & Direct' : controversy >= 40 ? 'Pragmatic' : 'Diplomatic'}
+                  color="var(--teal)" badgeColor="var(--teal)" />
+                <Slider label="Storytelling Depth" desc="Use of narrative arc vs operational literalism"
+                  value={storytelling} onChange={setStorytelling}
+                  leftLabel="Literal · 0%" midLabel="Subtle · 50%" rightLabel="Narrative-Rich · 100%"
+                  badgeLabel={storytelling >= 70 ? 'Story-First' : storytelling >= 40 ? 'Subtle & Tactical' : 'Literal'}
+                  color="var(--coral)" badgeColor="var(--coral)" />
+                <Slider label="Data Depth" desc="Evidence density and citation weight in generated posts"
+                  value={dataDepth} onChange={setDataDepth}
+                  leftLabel="Opinion-Led · 0%" midLabel="Balanced · 50%" rightLabel="Data-Heavy · 100%"
+                  badgeLabel={dataDepth >= 70 ? 'Evidence-Dense' : dataDepth >= 40 ? 'Balanced' : 'Opinion-Led'}
+                  color="var(--v)" badgeColor="var(--teal)" />
               </div>
               {/* Training data signal */}
               <div style={{ padding: '1rem', borderRadius: '0.75rem', background: 'var(--s1)', display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
