@@ -6,7 +6,9 @@ import { trpc } from '@/lib/trpc'
 export default function AnalyticsPage() {
   const { data: postStats } = trpc.posts.stats.useQuery()
   const { data: publishedPosts } = trpc.posts.list.useQuery({ status: 'published', limit: 10 })
+  const { data: weeklyRaw } = trpc.posts.weeklyStats.useQuery()
 
+  // Heatmap is still illustrative (no per-slot engagement data from APIs yet)
   const heatmapData = [
     { time: '07:00 AM', vals: [1.2, 2.1, 3.4, 2.0, 1.1, 0.4, 0.5] },
     { time: '09:30 AM', vals: [3.2, 4.8, 6.8, 4.9, 2.8, 1.2, 1.4] },
@@ -31,17 +33,15 @@ export default function AnalyticsPage() {
     return 'var(--t3)'
   }
 
-  const chartWeeks = [
-    { label: 'Sep 06', li: 55, x: 28, sub: 10 },
-    { label: 'Sep 13', li: 70, x: 30, sub: 11 },
-    { label: 'Sep 20', li: 80, x: 36, sub: 12 },
-    { label: 'Sep 27', li: 90, x: 38, sub: 13 },
-    { label: 'Oct 04', li: 75, x: 38, sub: 11 },
-    { label: 'Oct 11', li: 95, x: 41, sub: 14 },
-    { label: 'Oct 18', li: 145, x: 29, sub: 12, viral: true },
-    { label: 'Oct 25', li: 105, x: 43, sub: 16 },
-  ]
-  const maxH = 240
+  // Real weekly data from DB; normalise to a 0-200 bar scale
+  const chartWeeks = (weeklyRaw ?? []).map(w => ({
+    label: w.label,
+    li:    w.li,
+    x:     w.x,
+    sub:   w.other,
+    viral: false,
+  }))
+  const maxH = Math.max(200, ...chartWeeks.map(w => w.li + w.x + w.sub))
 
   const dispatches = (publishedPosts?.posts ?? []).map(post => ({
     title: post.body.slice(0, 60) + (post.body.length > 60 ? '…' : ''),
