@@ -137,6 +137,25 @@ export const podcastsRouter = router({
       return { subscription, isNew: true }
     }),
 
+  search: authedProc
+    .input(z.object({ q: z.string().min(1).max(200) }))
+    .query(async ({ ctx, input }) => {
+      const items = await ctx.prisma.audioItem.findMany({
+        where: {
+          subscription: { userId: ctx.userId, isActive: true },
+          OR: [
+            { title:       { contains: input.q, mode: 'insensitive' } },
+            { description: { contains: input.q, mode: 'insensitive' } },
+            { transcript:  { contains: input.q, mode: 'insensitive' } },
+          ],
+        },
+        take: 20,
+        orderBy: { publishedAt: 'desc' },
+        include: { subscription: { select: { id: true, title: true, coverUrl: true } } },
+      })
+      return { items }
+    }),
+
   unsubscribe: authedProc
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
