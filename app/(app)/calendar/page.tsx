@@ -63,7 +63,9 @@ export default function CalendarPage() {
   const [year,  setYear]  = useState(now.getFullYear())
   const [month, setMonth] = useState(now.getMonth() + 1) // 1-based
 
-  const { data, isLoading } = trpc.posts.byMonth.useQuery({ year, month })
+  const { data, isLoading, refetch } = trpc.posts.byMonth.useQuery({ year, month })
+  const reschedule = trpc.posts.update.useMutation({ onSuccess: () => refetch() })
+  const [dragging, setDragging] = useState<Post | null>(null)
 
   // Build a map: day-of-month → posts
   const postsByDay = new Map<number, Post[]>()
@@ -151,12 +153,23 @@ export default function CalendarPage() {
             const isToday = day === todayDay
             const posts   = day ? (postsByDay.get(day) ?? []) : []
             return (
-              <div key={i} style={{
+              <div key={i}
+                onDragOver={e => { if (day && dragging) e.preventDefault() }}
+                onDrop={e => {
+                  e.preventDefault()
+                  if (!day || !dragging) return
+                  const orig = dragging.scheduledAt ? new Date(dragging.scheduledAt) : new Date()
+                  const next = new Date(year, month - 1, day, orig.getHours(), orig.getMinutes())
+                  reschedule.mutate({ id: dragging.id, scheduledAt: next })
+                  setDragging(null)
+                }}
+                style={{
                 borderRight: '1px solid var(--b1)',
                 borderBottom: '1px solid var(--b1)',
                 padding: '6px',
-                background: day ? 'var(--bg)' : 'var(--s1)',
+                background: dragging && day ? 'color-mix(in srgb, var(--v) 4%, var(--bg))' : day ? 'var(--bg)' : 'var(--s1)',
                 opacity: day ? 1 : 0.4,
+                transition: 'background 120ms',
               }}>
                 {day && (
                   <>
@@ -169,14 +182,20 @@ export default function CalendarPage() {
                       marginBottom: '4px',
                     }}>{day}</div>
                     {posts.slice(0, 3).map(post => (
-                      <div key={post.id} style={{
-                        fontSize: '10px', lineHeight: '1.3',
-                        background: 'var(--s2)', borderRadius: '4px',
-                        padding: '2px 5px', marginBottom: '2px',
-                        borderLeft: `3px solid ${STATUS_COLOR[post.status] ?? 'var(--b2)'}`,
-                        color: 'var(--t2)',
-                        overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis',
-                      }}>
+                      <div key={post.id}
+                        draggable
+                        onDragStart={e => { e.stopPropagation(); setDragging(post) }}
+                        onDragEnd={() => setDragging(null)}
+                        style={{
+                          fontSize: '10px', lineHeight: '1.3',
+                          background: 'var(--s2)', borderRadius: '4px',
+                          padding: '2px 5px', marginBottom: '2px',
+                          borderLeft: `3px solid ${STATUS_COLOR[post.status] ?? 'var(--b2)'}`,
+                          color: 'var(--t2)',
+                          overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis',
+                          cursor: 'grab', opacity: dragging?.id === post.id ? 0.4 : 1,
+                          transition: 'opacity 120ms',
+                        }}>
                         {post.scheduledAt && (
                           <span style={{ color: 'var(--t3)', marginRight: '4px' }}>
                             {formatTime(post.scheduledAt)}
